@@ -271,6 +271,25 @@ class OrderanController extends Controller
         }
     }
 
+    public function orderanOfflineCetakNota($id){
+        try {
+            $orderan = Orderan::with([
+                'orderanOffline',
+                'jenisLaundry',
+                'statusCucian' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                },
+                'statusPembayaran' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                }
+            ])->where('id', $id)->first();
+
+            return view('staffs.offline.cetak_nota', compact('orderan'));
+        } catch (\Exception $e) {
+            return redirect('/orderanOffline')->with('error', 'Terjadi kesalahan saat mencetak nota: ' . $e->getMessage());
+        }
+    }
+
     // =========================================================================================
     // =========================================================================================
 
@@ -310,7 +329,7 @@ class OrderanController extends Controller
             } else {
                 $paketMember = PaketMember::with('paketLaundry')->whereHas('paketLaundry', function ($query) use ($orderan) {
                     $query->where('jenis_laundry_id', $orderan->jenis_laundry_id);
-                })->where('user_id', auth()->user()->id);
+                })->where('user_id', $orderan->orderanOnline->user_id);
 
                 $total_kg_sisa = $paketMember->sum('kg_sisa');
                 $paketMember = $paketMember->get();
@@ -324,23 +343,28 @@ class OrderanController extends Controller
                         'berat' => $request->berat,
                         'harga' => $request->harga
                     ]);
-
                     $berat = $request->berat;
                     foreach ($paketMember as $pm) {
-                        if ($pm->kg_sisa > $berat) {
-                            $pm->kg_terpakai = $pm->kg_terpakai + $berat;
-                            $pm->kg_sisa = $pm->kg_sisa - $berat;
-                            $pm->save();
-                            break;
-                        } else {
-                            if ($berat > 0) {
-                                $pm->kg_terpakai = $pm->kg_terpakai + $pm->kg_sisa;
-                                $pm->kg_sisa = $pm->kg_sisa - $pm->kg_sisa;
-                                $pm->save();
+                        if ($pm->kg_sisa > 0) {
+                            if ($berat > $pm->kg_sisa) {
+                                $terpakai = $pm->kg_terpakai + $pm->kg_sisa;
+                                $sisa = 0;
                                 $berat = $berat - $pm->kg_sisa;
+                                PaketMember::where('id', $pm->id)->update([
+                                    'kg_terpakai' => $terpakai,
+                                    'kg_sisa' => $sisa
+                                ]);
                             } else {
+                                $terpakai = $pm->kg_terpakai + $berat;
+                                $sisa = $pm->kg_sisa - $berat;
+                                PaketMember::where('id', $pm->id)->update([
+                                    'kg_terpakai' => $terpakai,
+                                    'kg_sisa' => $sisa
+                                ]);
                                 break;
                             }
+                        } else {
+                            continue;
                         }
                     }
                 } else {

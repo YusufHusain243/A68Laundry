@@ -354,6 +354,10 @@
             );
         }
 
+        function cetakNota(id) {
+            window.open('/orderanOffline/cetakNota/' + id, '_blank');
+        }
+
         function bayarTransfer(id) {
             snap.pay(id, {
                 onSuccess: function(result) {

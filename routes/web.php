@@ -70,6 +70,7 @@ Route::middleware(['staff'])->group(function () {
     Route::post('/orderanOffline/cucianSelesai/{id}', [OrderanController::class, 'orderanOfflineCucianSelesai']);
     Route::post('/orderanOffline/cucianDiambil/{id}', [OrderanController::class, 'orderanOfflineCucianDiambil']);
     Route::get('/orderanOffline/bayar/success/{id}', [OrderanController::class, 'orderanOfflineBayarSuccess']);
+    Route::get('/orderanOffline/cetakNota/{id}', [OrderanController::class, 'orderanOfflineCetakNota']);
 
     // orderan online
     Route::get('/orderanOnline', [OrderanController::class, 'orderanOnline']);
@@ -100,6 +101,7 @@ Route::middleware(['member'])->group(function () {
     Route::post('/orderLangsung/bayarOrderan', [OrderanOnlineController::class, 'bayarOrderan']);
     Route::get('/orderLangsung/bayarOrderan/success/{id}', [OrderanOnlineController::class, 'bayarOrderanSuccess']);
     Route::post('/orderLangsung/selesai/{id}', [OrderanOnlineController::class, 'orderLangsungSelesai']);
+    Route::get('/orderLangsung/cetakNota/{id}', [OrderanOnlineController::class, 'orderLangsungCetakNota']);
 
     // order paket 
     Route::get('/orderPaket', [OrderanOnlineController::class, 'orderPaket']);
@@ -110,4 +112,5 @@ Route::middleware(['member'])->group(function () {
     Route::get('/orderPaket/geocode', [OrderanOnlineController::class, 'searchPaket']);
     Route::post('/orderPaket/updateLocation', [OrderanOnlineController::class, 'updateLocationPaket']);
     Route::post('/orderPaket/selesai/{id}', [OrderanOnlineController::class, 'orderPaketSelesai']);
+    Route::get('/orderPaket/cetakNota/{id}', [OrderanOnlineController::class, 'orderPaketCetakNota']);
 });

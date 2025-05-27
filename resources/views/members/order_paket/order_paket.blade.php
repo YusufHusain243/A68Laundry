@@ -242,26 +242,15 @@
                                 <button class="dropdown-item" type="button" onclick="detailData('${row.id}')">Detail</button>
                                 <button class="dropdown-item" type="button" onclick="cetakNota('${row.id}')">Cetak Nota</button>
                             `;
-                            if (statusPembayaran === 'Belum Lunas') {
-                                if (statusCucian === 'Menunggu Set Lokasi') {
-                                    dropdownItems +=
-                                        `<button class="dropdown-item" type="button" onclick="setLocation('${row.id}')">Set Lokasi Jemput</button>`;
-                                }
-                                if (statusCucian === 'Menunggu Pembayaran') {
-                                    dropdownItems +=
-                                        `<button class="dropdown-item" type="button" onclick="bayar('${row.id}')">Bayar</button>`;
-                                }
-                                if(statusCucian === 'Menunggu Set Lokasi' || statusCucian === 'Menunggu Cucian Diambil'){
-                                    dropdownItems += `
-                                        <button class="dropdown-item" type="button" onclick="editData('${row.id}')">Edit</button>
-                                        <button class="dropdown-item" type="button" onclick="hapusData('${row.id}')">Hapus</button>
-                                    `;
-                                }
-                            }
-
-                            if (statusPembayaran === 'Menunggu Pembayaran') {
+                            if (statusCucian === 'Menunggu Set Lokasi') {
                                 dropdownItems +=
-                                    `<button class="dropdown-item" type="button" onclick="bayar('${row.id}')">Bayar</button>`;
+                                    `<button class="dropdown-item" type="button" onclick="setLocation('${row.id}')">Set Lokasi Jemput</button>`;
+                            }
+                            if(statusCucian === 'Menunggu Set Lokasi' || statusCucian === 'Menunggu Cucian Diambil'){
+                                dropdownItems += `
+                                    <button class="dropdown-item" type="button" onclick="editData('${row.id}')">Edit</button>
+                                    <button class="dropdown-item" type="button" onclick="hapusData('${row.id}')">Hapus</button>
+                                `;
                             }
 
                             if (statusCucian === 'Cucian Diantar') {
@@ -428,6 +417,10 @@
                 '/orderPaket/selesai/', 
                 id
             );
+        }
+
+        function cetakNota(id) {
+            window.open('/orderPaket/cetakNota/' + id, '_blank');
         }
 
         $('#addModalOrderPaket').on('show.bs.modal', function(event) {

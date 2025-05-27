@@ -252,6 +252,26 @@ class OrderanOnlineController extends Controller
         return $this->updateData($id, 'Order Selesai', null);
     }
 
+    public function orderLangsungCetakNota($id)
+    {
+        try {
+            $orderan = Orderan::with([
+                'orderanOnline',
+                'jenisLaundry',
+                'statusCucian' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                },
+                'statusPembayaran' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                }
+            ])->where('id', $id)->first();
+
+            return view('members.order_langsung.cetak_nota', compact('orderan'));
+        } catch (\Exception $e) {
+            return redirect('/orderLangsung')->with('error', 'Terjadi kesalahan saat mencetak nota: ' . $e->getMessage());
+        }
+    }
+
     // =================================================================================================
     // =================================================================================================
 
@@ -404,5 +424,25 @@ class OrderanOnlineController extends Controller
     public function orderPaketSelesai($id)
     {
         return $this->updateData($id, 'Order Selesai', null);
+    }
+
+    public function orderPaketCetakNota($id)
+    {
+        try {
+            $orderan = Orderan::with([
+                'orderanOnline',
+                'jenisLaundry',
+                'statusCucian' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                },
+                'statusPembayaran' => function ($query) {
+                    $query->orderBy('tgl', 'asc');
+                }
+            ])->where('id', $id)->first();
+
+            return view('members.order_paket.cetak_nota', compact('orderan'));
+        } catch (\Exception $e) {
+            return redirect('/orderPaket')->with('error', 'Terjadi kesalahan saat mencetak nota: ' . $e->getMessage());
+        }
     }
 }

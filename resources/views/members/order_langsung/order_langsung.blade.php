@@ -395,6 +395,10 @@
             );
         }
 
+        function cetakNota(id) {
+            window.open('/orderLangsung/cetakNota/' + id, '_blank');
+        }
+
         $('#addModalOrderLangsung').on('show.bs.modal', function(event) {
             let id = $('#id').val();
             let form = $('#orderLangsungForm');
