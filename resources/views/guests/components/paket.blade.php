@@ -3,7 +3,7 @@
         <div>
             <div class="mx-auto max-w-2xl text-center">
                 <h2 class="m-0 text-primary-emphasis text-base leading-7 fw-semibold">
-                    Paket Member
+                    Paket Laundry
                 </h2>
                 <p class="m-0 mt-2 text-body-emphasis text-4xl tracking-tight fw-bold">
                     Layanan Laundry Premium Untuk Pelanggan Setia

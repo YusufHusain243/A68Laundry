@@ -106,7 +106,7 @@
                         
                         <li class="nav-item">
                             <a href="#paketMember" class="px-3 text-body-emphasis bg-body-secondary-hover nav-link rounded-3 text-base leading-6 fw-semibold">
-                                Paket Member
+                                Paket Laundry
                             </a>
                         </li>
                         
