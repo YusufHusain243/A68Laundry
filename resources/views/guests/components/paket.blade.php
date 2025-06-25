@@ -32,7 +32,7 @@
                             </h3>
                             <a href="/paketLaundryMember" class="btn btn-lg btn-primary text-white text-sm fw-semibold mt-3"
                                 data-aos-delay="200" data-aos="fade" data-aos-duration="3000">
-                                Daftar Paket
+                                Order Paket
                             </a>
                         </div>
                     </div>

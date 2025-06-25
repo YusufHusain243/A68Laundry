@@ -34,7 +34,10 @@
     @include('guests.components.banner')
     @include('guests.components.service')
     @include('guests.components.paket')
-    @include('guests.components.status_cucian')
+
+    @if (!Auth::check())
+        @include('guests.components.status_cucian')
+    @endif
 
     @include('guests.components.footer')
 

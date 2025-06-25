@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BiodataController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\JenisLaundryController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\OrderanController;
 use App\Http\Controllers\OrderanOnlineController;
 use App\Http\Controllers\PaketLaundryController;
 use App\Http\Controllers\PaketMemberController;
+use App\Http\Controllers\RiwayatCucian;
+use App\Http\Controllers\RiwayatCucianController;
 use Illuminate\Support\Facades\Route;
 
 // GUEST 
@@ -113,4 +116,11 @@ Route::middleware(['member'])->group(function () {
     Route::post('/orderPaket/updateLocation', [OrderanOnlineController::class, 'updateLocationPaket']);
     Route::post('/orderPaket/selesai/{id}', [OrderanOnlineController::class, 'orderPaketSelesai']);
     Route::get('/orderPaket/cetakNota/{id}', [OrderanOnlineController::class, 'orderPaketCetakNota']);
+
+    // ====================================
+    Route::get('/biodata', [BiodataController::class, 'index']);
+    Route::post('/biodata/update', [BiodataController::class, 'update']);
+
+    Route::get('/riwayatCucian', [RiwayatCucianController::class, 'index']);
+    Route::get('/getDataRiwayatCucian/{kategori}', [RiwayatCucianController::class, 'getDataRiwayatCucian']);
 });
