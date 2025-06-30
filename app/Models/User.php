@@ -37,4 +37,9 @@ class User extends Authenticatable
     public function orderanTambahan(){
         return $this->hasMany(OrderanTambahan::class);
     }
+
+    public function keranjang()
+    {
+        return $this->hasMany(Keranjang::class);
+    }
 }

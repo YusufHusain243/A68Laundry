@@ -11,17 +11,37 @@
 
         <div class="collapse navbar-collapse" id="navbarsFurni">
             <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{{ url('#hero') }}">Home</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
                 </li>
-                <li><a class="nav-link" href="{{ url('#laundry') }}">Laundry</a></li>
-                <li><a class="nav-link" href="{{ url('#paket') }}">Paket</a></li>
-                <li><a class="nav-link" href="{{ url('#statusCucian') }}">Status Cucian</a></li>
+                <li><a class="nav-link" href="{{ url('/') }}#laundry">Laundry</a></li>
+                <li><a class="nav-link" href="{{ url('/') }}#paket">Paket</a></li>
+                <li><a class="nav-link" href="{{ url('/') }}#statusCucian">Status Cucian</a></li>
             </ul>
 
             <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-                <li><a class="nav-link" href="#"><img src="{{asset('assets_customers/images/user.svg')}}"></a></li>
-                <li><a class="nav-link" href="cart.html"><img src="{{asset('assets_customers/images/cart.svg')}}"></a></li>
+                @if (Auth::check())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ asset('assets_customers/images/user.svg') }}">
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                @else
+                    <li><a class="nav-link" href="/profile"><img
+                                src="{{ asset('assets_customers/images/user.svg') }}"></a></li>
+                @endif
+                
+                <li>
+                    <a class="nav-link" href="/keranjang">
+                        <img src="{{ asset('assets_customers/images/cart.svg') }}">
+                        <span class="badge bg-danger">{{$jumlahKeranjang}}</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

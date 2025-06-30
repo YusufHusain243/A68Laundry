@@ -4,12 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JenisLaundryController;
-use App\Http\Controllers\OrderanController;
+use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\OrderanOfflineController;
 use App\Http\Controllers\OrderanOnlineController;
 use App\Http\Controllers\PaketLaundryController;
-use App\Models\OrderanOffline;
-use App\Models\OrderanOnline;
 use Illuminate\Support\Facades\Route;
 
 // GUEST 
@@ -19,7 +17,9 @@ Route::get('/', [CustomerController::class, 'index']);
 
 //auth customer
 Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
+Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
 Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
+Route::post('/registerCustomer', [AuthController::class, 'registerCustomerStore']);
 
 // loginStaff
 Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
@@ -71,4 +71,21 @@ Route::middleware(['staff'])->group(function () {
     Route::post('/orderanOnline/inputTimbangan', [OrderanOnlineController::class, 'orderanOnlineInputTimbangan']);
     Route::post('/orderanOnline/cuciSelesai/{id}', [OrderanOnlineController::class, 'orderanOnlineCuciSelesai']);
     Route::post('/orderanOnline/antarCucian/{id}', [OrderanOnlineController::class, 'orderanOnlineAntarCucian']);
+});
+
+// CUSTOMER
+// =================================================
+Route::middleware(['customer'])->group(function () {
+    //profile
+    Route::get('/profile', [CustomerController::class, 'profileCustomer']);
+    Route::post('/profile/update', [CustomerController::class, 'updateProfile']);
+
+    //keranjang
+    Route::get('/keranjang', [KeranjangController::class, 'index']);
+    Route::get('/keranjang/store/{id}', [KeranjangController::class, 'store']);
+    Route::get('/keranjang/destroy/{id}', [KeranjangController::class, 'destroy']);
+    Route::post('/keranjang/cekout', [KeranjangController::class, 'cekout']);
+
+    //laundry
+    Route::get('/laundry', [CustomerController::class, 'laundry']);
 });

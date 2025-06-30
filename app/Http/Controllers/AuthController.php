@@ -20,13 +20,14 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
+            // dd(auth()->attempt($request->only('username', 'password')));
             if (auth()->attempt($request->only('username', 'password'))) {
-                return redirect('/paketLaundryMember')->with('success', 'Login successful!');
+                return redirect('/')->with('success', 'Login successful!');
             }
 
-            return back()->withInput()->withErrors(['error' => 'Invalid credentials']);
+            return redirect('/loginCustomer')->withErrors(['error' => 'Invalid credentials']);
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+            return redirect('/loginCustomer')->withErrors(['error' => $e->getMessage()]);
         }
     }
     
@@ -83,11 +84,12 @@ class AuthController extends Controller
 
     public function registerCustomerStore(Request $request)
     {
+        // dd($request->all());
         try {
             $request->validate([
                 'nama' => 'required|string|max:255',
                 'no_hp' => 'required|string|max:15',
-                'email' => 'required|string|email|max:255|unique:users',
+                'email' => 'required|string|email|max:255',
                 'alamat' => 'required|string|max:255',
                 'username' => 'required|string|max:255',
                 'password' => 'required|string',
@@ -104,7 +106,7 @@ class AuthController extends Controller
             ]);
 
             // Redirect to the login page with a success message
-            return redirect('/loginMember')->with('success', 'Registration successful! Please log in.');
+            return redirect('/loginCustomer')->with('success', 'Registration successful! Please log in.');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }

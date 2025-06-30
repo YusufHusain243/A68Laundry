@@ -12,7 +12,7 @@
                         <a href="{{ url('#laundry') }}" class="btn btn-secondary me-2">
                             Order Sekarang
                         </a>
-                        <a href="{{ url('/register') }}" class="btn btn-white-outline">
+                        <a href="{{ url('/registerCustomer') }}" class="btn btn-white-outline">
                             Jadi Member
                         </a>
                     </p>

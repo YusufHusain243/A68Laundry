@@ -49,7 +49,7 @@
                             <br>
                             <div class="form-group">
                                 <label class="text-black" for="password">Password</label>
-                                <input type="password" class="form-control" name="username" id="password">
+                                <input type="password" class="form-control" name="password" id="password">
                             </div>
                             <br>
                             Belum Memiliki Akun? <b><a href="/registerCustomer">Register Disini</a></b>

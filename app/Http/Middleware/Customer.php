@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
-class Member
+class Customer
 {
     /**
      * Handle an incoming request.
@@ -17,12 +17,12 @@ class Member
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
-            return redirect('/loginMember')
+            return redirect('/loginCustomer')
                 ->withErrors(['login' => 'Silakan login untuk melanjutkan']);
         }
 
         if (auth()->user()->role !== 'Member') {
-            return redirect('/loginMember')
+            return redirect('/loginCustomer')
                 ->withErrors(['login' => 'Hanya Member yang bisa mengakses halaman ini']);
         }
 

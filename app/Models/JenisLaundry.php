@@ -18,4 +18,9 @@ class JenisLaundry extends Model
     public function orderan(){
         return $this->hasMany(Orderan::class);
     }
+
+    public function keranjang()
+    {
+        return $this->hasMany(Keranjang::class);
+    }
 }
