@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 // landing page 
 Route::get('/', [CustomerController::class, 'index']);
 
+//auth customer
+Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
+Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
+
 // loginStaff
 Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
 Route::post('/loginStaffAuth', [AuthController::class, 'loginStaffAuth']);

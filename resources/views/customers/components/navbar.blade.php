@@ -12,11 +12,11 @@
         <div class="collapse navbar-collapse" id="navbarsFurni">
             <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="">Home</a>
+                    <a class="nav-link" href="{{ url('#hero') }}">Home</a>
                 </li>
-                <li><a class="nav-link" href="">Laundry</a></li>
-                <li><a class="nav-link" href="">Paket</a></li>
-                <li><a class="nav-link" href="">Status Cucian</a></li>
+                <li><a class="nav-link" href="{{ url('#laundry') }}">Laundry</a></li>
+                <li><a class="nav-link" href="{{ url('#paket') }}">Paket</a></li>
+                <li><a class="nav-link" href="{{ url('#statusCucian') }}">Status Cucian</a></li>
             </ul>
 
             <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">

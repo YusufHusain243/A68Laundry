@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function loginMember()
+    public function loginCustomer()
     {
-        return view('guests.login');
+        return view('customers.login');
     }
 
-    public function loginMemberAuth(Request $request)
+    public function loginCustomerAuth(Request $request)
     {
         try {
             $request->validate([
@@ -76,12 +76,12 @@ class AuthController extends Controller
         }
     }
 
-    public function registerMember()
+    public function registerCustomer()
     {
-        return view('guests.register');
+        return view('customers.register');
     }
 
-    public function registerMemberStore(Request $request)
+    public function registerCustomerStore(Request $request)
     {
         try {
             $request->validate([
