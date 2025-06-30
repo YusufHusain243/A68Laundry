@@ -5,7 +5,7 @@
             <a href="/" class="b-brand text-primary">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <img src="{{ asset('assets_customer/logo/logo.png') }}" alt="logo" class="logo logo-lg"
+                        <img src="{{  asset('assets_admin/img/logo.png') }}" alt="logo" class="logo logo-lg"
                             width="50" />
                     </div>
                     <div class="col text-start">

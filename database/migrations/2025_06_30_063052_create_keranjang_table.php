@@ -11,16 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orderans', function (Blueprint $table) {
+        Schema::create('keranjang', function (Blueprint $table) {
             $table->id();
             $table->foreignId('jenis_laundry_id')->constrained('jenis_laundries')->onDelete('cascade');
-            $table->string('kode_order');
-            $table->string('berat')->nullable();
-            $table->string('harga')->nullable();
-            $table->string('metode_pembayaran');
-            $table->string('is_offline');
-            $table->string('is_paket');
-            $table->string('snap_token')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('status');
             $table->timestamps();
         });
@@ -31,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orderans');
+        Schema::dropIfExists('keranjang');
     }
 };
