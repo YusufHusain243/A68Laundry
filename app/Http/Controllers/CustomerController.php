@@ -69,4 +69,12 @@ class CustomerController extends Controller
             ->count();
         return view('customers.laundry', compact('laundry','jumlahKeranjang'));
     }
+    
+    public function paket(){
+        $paket = PaketLaundry::all();
+        $jumlahKeranjang = Keranjang::where('user_id', auth()->user()->id)
+            ->where('status', '0')
+            ->count();
+        return view('customers.paket', compact('paket','jumlahKeranjang'));
+    }
 }

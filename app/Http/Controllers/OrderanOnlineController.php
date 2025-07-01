@@ -17,7 +17,7 @@ use Midtrans\Snap;
 
 class OrderanOnlineController extends Controller
 {
-    // private function updateData($id, $statusCucian, $statusPembayaran = null)
+    // public function updateData($id, $statusCucian, $statusPembayaran = null)
     // {
     //     try {
     //         if ($statusPembayaran !== null) {

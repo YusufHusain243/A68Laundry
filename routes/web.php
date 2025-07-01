@@ -7,30 +7,31 @@ use App\Http\Controllers\JenisLaundryController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\OrderanOfflineController;
 use App\Http\Controllers\OrderanOnlineController;
+use App\Http\Controllers\PaketCustomerController;
 use App\Http\Controllers\PaketLaundryController;
+use App\Http\Controllers\PaketMemberController;
 use Illuminate\Support\Facades\Route;
 
 // GUEST 
 // =================================================
-// landing page 
-Route::get('/', [CustomerController::class, 'index']);
+// Route::middleware(['guest'])->group(function () {
+    // landing page 
+    Route::get('/', [CustomerController::class, 'index']);
 
-//auth customer
-Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
-Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
-Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
-Route::post('/registerCustomer', [AuthController::class, 'registerCustomerStore']);
+    //auth customer
+    Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
+    Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
+    Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
+    Route::post('/registerCustomer', [AuthController::class, 'registerCustomerStore']);
 
-// loginStaff
-Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
-Route::post('/loginStaffAuth', [AuthController::class, 'loginStaffAuth']);
+    // loginStaff
+    Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
+    Route::post('/loginStaffAuth', [AuthController::class, 'loginStaffAuth']);
 
-// loginOwner
-Route::get('/loginOwner', [AuthController::class, 'loginOwner']);
-Route::post('/loginOwnerAuth', [AuthController::class, 'loginOwnerAuth']);
-
-// logout
-Route::get('/logout', [AuthController::class, 'logout']);
+    // loginOwner
+    Route::get('/loginOwner', [AuthController::class, 'loginOwner']);
+    Route::post('/loginOwnerAuth', [AuthController::class, 'loginOwnerAuth']);
+// });
 
 // OWNER
 // =================================================
@@ -49,6 +50,9 @@ Route::middleware(['owner'])->group(function () {
     Route::post('/paketLaundryOwner', [PaketLaundryController::class, 'store']);
     Route::post('/paketLaundryOwner/update', [PaketLaundryController::class, 'update']);
     Route::post('/paketLaundryOwner/destroy/{id}', [PaketLaundryController::class, 'destroy']);
+
+    // logout
+    Route::get('/logout', [AuthController::class, 'logout']);
 });
 
 // STAFF
@@ -71,6 +75,9 @@ Route::middleware(['staff'])->group(function () {
     Route::post('/orderanOnline/inputTimbangan', [OrderanOnlineController::class, 'orderanOnlineInputTimbangan']);
     Route::post('/orderanOnline/cuciSelesai/{id}', [OrderanOnlineController::class, 'orderanOnlineCuciSelesai']);
     Route::post('/orderanOnline/antarCucian/{id}', [OrderanOnlineController::class, 'orderanOnlineAntarCucian']);
+
+    // logout
+    Route::get('/logout', [AuthController::class, 'logout']);
 });
 
 // CUSTOMER
@@ -88,4 +95,13 @@ Route::middleware(['customer'])->group(function () {
 
     //laundry
     Route::get('/laundry', [CustomerController::class, 'laundry']);
+
+    //paket
+    Route::get('/paket', [CustomerController::class, 'paket']);
+
+    // logout
+    Route::get('/logout', [AuthController::class, 'logout']);
+
+    // paket
+    Route::get('/paket/payment/{id}', [PaketCustomerController::class, 'store']);
 });

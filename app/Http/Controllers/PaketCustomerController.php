@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
 
-class PaketMemberController extends Controller
+class PaketCustomerController extends Controller
 {
     public function index()
     {
@@ -17,17 +17,13 @@ class PaketMemberController extends Controller
         return view('members.paket.paket', compact('paketMember', 'paketLaundry'));
     }
 
-    public function store(Request $request)
+    public function store($id)
     {
         try {
-            $request->validate([
-                'paket_laundry_id' => 'required',
-            ]);
-
-            $paketLaundry = PaketLaundry::findOrFail($request->paket_laundry_id);
+            $paketLaundry = PaketLaundry::findOrFail($id);
 
             $paketMember = PaketMember::create([
-                'paket_laundry_id' => $request->paket_laundry_id,
+                'paket_laundry_id' => $id,
                 'user_id' => auth()->user()->id,
                 'kg_terpakai' => 0,
                 'kg_sisa' => $paketLaundry->berat,
