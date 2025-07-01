@@ -30,11 +30,12 @@ class PaketCustomerController extends Controller
                 'status_pembayaran' => 'Belum Lunas',
             ]);
 
+            
             Config::$serverKey = config('midtrans.serverKey');
             Config::$isProduction = false;
             Config::$isSanitized = true;
             Config::$is3ds = true;
-
+            
             $params = array(
                 'transaction_details' => array(
                     'order_id' => rand(),
@@ -54,9 +55,12 @@ class PaketCustomerController extends Controller
                 'snap_token' => $snapToken,
             ]);
 
-            return redirect('/paketLaundryMember')->with('success', 'Paket laundry berhasil ditambahkan');
+            return response()->json(['snap_token' => $snapToken]);
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat melakukan pembayaran: ' . $e->getMessage()
+            ], 500);
         }
     }
 
