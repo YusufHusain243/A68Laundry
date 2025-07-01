@@ -41,7 +41,7 @@
             <div class="row">
                 @foreach ($paket as $p)
                     <div class="col-12 col-md-4 col-lg-3 mb-5">
-                        <a class="product-item" href="/paket/payment/{{ $p->id }}">
+                        <a class="product-item" href="#" onclick="bayar('{{ $p->id }}')">
                             <img src="{{ asset('images/' . $p->jenisLaundry->foto) }}"
                                 class="img-fluid product-thumbnail">
                             <h3 class="product-title">{{ $p->jenisLaundry->nama }}</h3>
@@ -67,46 +67,54 @@
 
     <script>
         function bayar(id) {
-            $.ajax({
-                url: "/paket/payment/" + id,
-                type: "GET",
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            snap.pay(id, {
+                onSuccess: function(result) {
+                    window.location.href = 'paketLaundryMember/bayar/success/' + id;
                 },
-                data: {
-                    _token: "{{ csrf_token() }}",
+                onPending: function(result) {
+                    document.getElementById('result-json').innerHTML += JSON.stringify(
+                        result, null, 2);
                 },
-                success: function(response) {
-                    snap.pay(response.snap_token, {
-                        onSuccess: function(result) {
-                            console.log(result);
-                            window.location.href = 'orderLangsung/bayarOrderan/success/' + response
-                                .snap_token;
-                        },
-                        onPending: function(result) {
-                            console.log(result);
-                            
-                            document.getElementById('result-json').innerHTML += JSON
-                                .stringify(
-                                    result, null, 2);
-                        },
-                        onError: function(result) {
-                            console.log(result);
-                            document.getElementById('result-json').innerHTML += JSON
-                                .stringify(
-                                    result, null, 2);
-                        }
-                    });
-                },
-                error: function(xhr) {
-                    Swal.fire(
-                        "Gagal!",
-                        "Terjadi kesalahan saat memproses data.",
-                        "error"
-                    );
+                onError: function(result) {
+                    document.getElementById('result-json').innerHTML += JSON.stringify(
+                        result, null, 2);
                 }
             });
         }
+        // function bayar(id) {
+        //     $.ajax({
+        //         url: "/paket/payment/" + id,
+        //         type: "GET",
+        //         headers: {
+        //             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+        //         },
+        //         data: {
+        //             _token: "{{ csrf_token() }}",
+        //         },
+        //         success: function(response) {
+        //             snap.pay(id, {
+        //                 onSuccess: function(result) {
+        //                     window.location.href = 'paketLaundryMember/bayar/success/' + id;
+        //                 },
+        //                 onPending: function(result) {
+        //                     document.getElementById('result-json').innerHTML += JSON.stringify(
+        //                         result, null, 2);
+        //                 },
+        //                 onError: function(result) {
+        //                     document.getElementById('result-json').innerHTML += JSON.stringify(
+        //                         result, null, 2);
+        //                 }
+        //             });
+        //         },
+        //         error: function(xhr) {
+        //             Swal.fire(
+        //                 "Gagal!",
+        //                 "Terjadi kesalahan saat memproses data.",
+        //                 "error"
+        //             );
+        //         }
+        //     });
+        // }
     </script>
 
 </body>
