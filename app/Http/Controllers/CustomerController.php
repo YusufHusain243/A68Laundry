@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisLaundry;
 use App\Models\Keranjang;
+use App\Models\Orderan;
+use App\Models\OrderanOnline;
 use App\Models\PaketLaundry;
 use App\Models\User;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -15,7 +17,7 @@ class CustomerController extends Controller
     {
         $laundry = JenisLaundry::latest()->take(3)->get();
         $paket = PaketLaundry::latest()->take(3)->get();
-        $jumlahKeranjang = auth()->check() ? Keranjang::where('user_id', auth()->user()->id)
+        $jumlahKeranjang = Auth::check() ? Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count() : 0;
         return view('customers.main', compact('laundry', 'paket', 'jumlahKeranjang'));
@@ -23,7 +25,7 @@ class CustomerController extends Controller
 
     public function profileCustomer()
     {
-        $profile = User::where('id', auth()->user()->id)->first();
+        $profile = User::where('id', Auth::user()->id)->first();
         return view('customers.profile', compact('profile'));
     }
 
@@ -38,7 +40,7 @@ class CustomerController extends Controller
                 'username' => 'required|string|max:255',
             ]);
 
-            $profile = User::where('id', auth()->user()->id)->first();
+            $profile = User::where('id', Auth::user()->id)->first();
 
             $dataToUpdate = [
                 'nama' => $request->nama,
@@ -64,7 +66,7 @@ class CustomerController extends Controller
 
     public function laundry(){
         $laundry = JenisLaundry::all();
-        $jumlahKeranjang = Keranjang::where('user_id', auth()->user()->id)
+        $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
         return view('customers.laundry', compact('laundry','jumlahKeranjang'));
@@ -72,9 +74,18 @@ class CustomerController extends Controller
     
     public function paket(){
         $paket = PaketLaundry::all();
-        $jumlahKeranjang = Keranjang::where('user_id', auth()->user()->id)
+        $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
         return view('customers.paket', compact('paket','jumlahKeranjang'));
+    }
+    
+    public function transaksi(){
+        $orderan = OrderanOnline::where('user_id', Auth::user()->id)
+            ->get();
+        $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
+            ->where('status', '0')
+            ->count();
+        return view('customers.transaksi', compact('orderan','jumlahKeranjang'));
     }
 }

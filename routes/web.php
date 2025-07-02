@@ -106,4 +106,7 @@ Route::middleware(['customer'])->group(function () {
     Route::get('/paketSaya', [PaketCustomerController::class, 'index']);
     Route::post('/paket/payment', [PaketCustomerController::class, 'store']);
     Route::get('/paket/payment/success/{snap}', [PaketCustomerController::class, 'paymentSuccess']);
+
+    //transaksi
+    Route::get('/transaksiSaya', [CustomerController::class, 'transaksi']);
 });

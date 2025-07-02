@@ -29,6 +29,7 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="/profile">Profile</a></li>
                             <li><a class="dropdown-item" href="/paketSaya">Paket Saya</a></li>
+                            <li><a class="dropdown-item" href="/transaksiSaya">Transaksi Saya</a></li>
                             <li><a class="dropdown-item" href="/logout">Logout</a></li>
                         </ul>
                     </li>

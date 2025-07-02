@@ -18,7 +18,31 @@
 <body>
     @include('customers.components.navbar')
 
-    <!-- Start Hero Section -->
+    <!-- Notifikasi SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '{{ session('error') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+    </script>
+
+    <!-- Hero Section -->
     <div class="hero">
         <div class="container">
             <div class="row justify-content-between">
@@ -31,8 +55,8 @@
             </div>
         </div>
     </div>
-    <!-- End Hero Section -->
 
+    <!-- Main Section -->
     <div class="untree_co-section before-footer-section">
         <div class="container">
             <div class="row mb-5">
@@ -64,8 +88,10 @@
                                             <h2 class="h5 text-black">{{ $keranjang->jenisLaundry->nama }}</h2>
                                         </td>
                                         <td>{{ $keranjang->jenisLaundry->harga }}/KG</td>
-                                        <td><a href="/keranjang/destroy/{{ $keranjang->id }}"
-                                                class="btn btn-black btn-sm">X</a></td>
+                                        <td>
+                                            <a href="/keranjang/destroy/{{ $keranjang->id }}"
+                                                class="btn btn-black btn-sm">X</a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -87,6 +113,19 @@
                         </div>
                     </div>
 
+                    <!-- Dropdown Paket (muncul hanya jika metode Paket dipilih) -->
+                    <div class="mt-3" id="paketDropdown" style="display: none;">
+                        <label for="paket_id">Pilih Paket:</label>
+                        <select name="paket_id" id="paket_id" class="form-control">
+                            <option value="">-- Pilih Paket --</option>
+                            @foreach ($paketCustomer as $paket)
+                                <option value="{{ $paket->id }}">
+                                    {{ $paket->paketLaundry->jenislaundry->nama }} - Sisa: {{ $paket->kg_sisa }} KG
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Tombol Checkout -->
                     <div class="row justify-content-end mt-4">
                         <div class="col-md-12">
@@ -103,23 +142,30 @@
 
     @include('customers.components.footer')
 
+    <!-- Scripts -->
     <script src="{{ asset('assets_customers/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets_customers/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets_customers/js/custom.js') }}"></script>
 
     <script>
-        // Select All Checkbox
+        // Checkbox Select All
         document.getElementById('checkAll').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.item-checkbox');
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
-        // Tampilkan tombol jika metode pembayaran dipilih
         const paymentRadios = document.querySelectorAll('.payment-method');
         const checkoutBtn = document.getElementById('checkoutButton');
+        const paketDropdown = document.getElementById('paketDropdown');
 
+        // Show/hide paket dropdown + show checkout button
         paymentRadios.forEach(radio => {
             radio.addEventListener('change', () => {
+                if (radio.value === 'Paket') {
+                    paketDropdown.style.display = 'block';
+                } else {
+                    paketDropdown.style.display = 'none';
+                }
                 checkoutBtn.style.display = 'block';
             });
         });
@@ -137,6 +183,14 @@
             if (!selectedPayment) {
                 alert('Silakan pilih metode pembayaran.');
                 return false;
+            }
+
+            if (selectedPayment.value === 'Paket') {
+                const paketId = document.getElementById('paket_id').value;
+                if (!paketId) {
+                    alert('Silakan pilih paket yang ingin digunakan.');
+                    return false;
+                }
             }
 
             return true;
