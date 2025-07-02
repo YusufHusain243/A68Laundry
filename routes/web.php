@@ -91,7 +91,7 @@ Route::middleware(['customer'])->group(function () {
     Route::get('/keranjang', [KeranjangController::class, 'index']);
     Route::get('/keranjang/store/{id}', [KeranjangController::class, 'store']);
     Route::get('/keranjang/destroy/{id}', [KeranjangController::class, 'destroy']);
-    Route::post('/keranjang/cekout', [KeranjangController::class, 'cekout']);
+    Route::post('/keranjang/checkout', [KeranjangController::class, 'checkout']);
 
     //laundry
     Route::get('/laundry', [CustomerController::class, 'laundry']);
@@ -103,5 +103,7 @@ Route::middleware(['customer'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout']);
 
     // paket
-    Route::get('/paket/payment/{id}', [PaketCustomerController::class, 'store']);
+    Route::get('/paketSaya', [PaketCustomerController::class, 'index']);
+    Route::post('/paket/payment', [PaketCustomerController::class, 'store']);
+    Route::get('/paket/payment/success/{snap}', [PaketCustomerController::class, 'paymentSuccess']);
 });

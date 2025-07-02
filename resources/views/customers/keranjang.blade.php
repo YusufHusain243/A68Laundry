@@ -36,7 +36,7 @@
     <div class="untree_co-section before-footer-section">
         <div class="container">
             <div class="row mb-5">
-                <form class="col-md-12" method="POST" action="/keranjang/cekout">
+                <form class="col-md-12" method="POST" action="/keranjang/checkout" onsubmit="return validateForm()">
                     @csrf
                     <div class="site-blocks-table">
                         <table class="table">
@@ -72,10 +72,28 @@
                         </table>
                     </div>
 
-                    <div class="row justify-content-end mt-3">
+                    <!-- Metode Pembayaran -->
+                    <div class="mt-4">
+                        <h5>Pilih Metode Pembayaran:</h5>
+                        <div class="form-check">
+                            <input class="form-check-input payment-method" type="radio" name="metode_pembayaran"
+                                id="transfer" value="Transfer">
+                            <label class="form-check-label" for="transfer">Transfer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input payment-method" type="radio" name="metode_pembayaran"
+                                id="paket" value="Paket">
+                            <label class="form-check-label" for="paket">Paket</label>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Checkout -->
+                    <div class="row justify-content-end mt-4">
                         <div class="col-md-12">
-                            <button type="submit" class="btn btn-black btn-lg py-3 btn-block"
-                                onclick="return validateSelection()">Proceed To Checkout</button>
+                            <button id="checkoutButton" type="submit" class="btn btn-black btn-lg py-3 btn-block"
+                                style="display: none;">
+                                Checkout
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -90,19 +108,37 @@
     <script src="{{ asset('assets_customers/js/custom.js') }}"></script>
 
     <script>
-        // Checkbox "Select All"
+        // Select All Checkbox
         document.getElementById('checkAll').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.item-checkbox');
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
-        // Validasi: jangan submit jika tidak ada yang dipilih
-        function validateSelection() {
-            const checked = document.querySelectorAll('.item-checkbox:checked');
-            if (checked.length === 0) {
+        // Tampilkan tombol jika metode pembayaran dipilih
+        const paymentRadios = document.querySelectorAll('.payment-method');
+        const checkoutBtn = document.getElementById('checkoutButton');
+
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                checkoutBtn.style.display = 'block';
+            });
+        });
+
+        // Validasi sebelum submit
+        function validateForm() {
+            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+            const selectedPayment = document.querySelector('input[name="metode_pembayaran"]:checked');
+
+            if (checkedItems.length === 0) {
                 alert('Silakan pilih minimal 1 item untuk melanjutkan checkout.');
                 return false;
             }
+
+            if (!selectedPayment) {
+                alert('Silakan pilih metode pembayaran.');
+                return false;
+            }
+
             return true;
         }
     </script>

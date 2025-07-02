@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Keranjang;
 use App\Models\PaketMember;
 use App\Models\PaketLaundry;
 use Illuminate\Http\Request;
@@ -12,18 +13,20 @@ class PaketCustomerController extends Controller
 {
     public function index()
     {
+        $jumlahKeranjang = Keranjang::where('user_id', auth()->user()->id)
+                ->where('status', '0')
+                ->count();
         $paketMember = PaketMember::with('paketLaundry.jenisLaundry')->where('user_id', auth()->user()->id)->get();
-        $paketLaundry = PaketLaundry::with('jenisLaundry')->get();
-        return view('members.paket.paket', compact('paketMember', 'paketLaundry'));
+        return view('customers.paketSaya', compact('paketMember', 'jumlahKeranjang'));
     }
 
-    public function store($id)
+    public function store(Request $request)
     {
         try {
-            $paketLaundry = PaketLaundry::findOrFail($id);
+            $paketLaundry = PaketLaundry::findOrFail($request->input('id'));
 
             $paketMember = PaketMember::create([
-                'paket_laundry_id' => $id,
+                'paket_laundry_id' => $request->input('id'),
                 'user_id' => auth()->user()->id,
                 'kg_terpakai' => 0,
                 'kg_sisa' => $paketLaundry->berat,
@@ -64,47 +67,16 @@ class PaketCustomerController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function paymentSuccess($snap)
     {
         try {
-            $paketMember = PaketMember::findOrFail($id);
-            $paketMember->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Data berhasil dihapus'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data gagal dihapus: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function update(Request $request)
-    {
-        $validated =  $request->validate([
-            'paket_laundry_id' => 'required',
-        ]);
-
-        try {
-            PaketMember::where('id', $request->id)->update($validated);
-            return redirect('/paketLaundryMember')->with('success', 'Data berhasil diubah');
-        } catch (\Exception $e) {
-            return redirect('/paketLaundryMember')->with('error', 'Data gagal diubah: ' . $e->getMessage());
-        }
-    }
-
-    public function bayarSuccess($id)
-    {
-        try {
-            $paketMember = PaketMember::where('snap_token', $id)->firstOrFail();
+            $paketMember = PaketMember::where('snap_token', $snap)->firstOrFail();
             $paketMember->update([
-                'status_pembayaran' => 'Lunas',
+            'status_pembayaran' => 'Lunas',
             ]);
-            return redirect('/paketLaundryMember')->with('success', 'Pembayaran berhasil');
+            return redirect()->back()->with('success', 'Pembayaran berhasil');
         } catch (\Exception $e) {
-            return redirect('/paketLaundryMember')->with('error', 'Pembayaran gagal: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Pembayaran gagal: ' . $e->getMessage());
         }
     }
 }

@@ -4,7 +4,7 @@
         <div class="row justify-content-end">
             @foreach ($paket as $p)
                 <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-                    <a class="product-item" href="/paket/payment/{{$p->id}}">
+                    <a class="product-item" href="#" onclick="bayar('{{ $p->id }}')">
                         <img src="{{ asset('images/' . $p->jenisLaundry->foto) }}"
                             class="img-fluid product-thumbnail">
                         <h3 class="product-title">{{ $p->jenisLaundry->nama }}</h3>

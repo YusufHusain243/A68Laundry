@@ -4,9 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="shortcut icon" href="favicon.png">
-
     <meta name="description" content="" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Bootstrap CSS -->
     <link href="{{ asset('assets_customers/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -19,6 +18,30 @@
 <body>
     @include('customers.components.navbar')
 
+    <!-- Notifikasi SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '{{ session('error') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+    </script>
+
     <!-- Start Hero Section -->
     <div class="hero">
         <div class="container">
@@ -29,7 +52,6 @@
                     </div>
                 </div>
                 <div class="col-lg-7">
-
                 </div>
             </div>
         </div>
@@ -58,65 +80,63 @@
 
     @include('customers.components.footer')
 
+    <!-- Loader Spinner -->
+    <div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <script src="{{ asset('assets_customers/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets_customers/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets_customers/js/custom.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
-    </script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
     <script>
         function bayar(id) {
-            snap.pay(id, {
-                onSuccess: function(result) {
-                    window.location.href = 'paketLaundryMember/bayar/success/' + id;
+            // Tampilkan loader
+            $("#loader").css("display", "flex");
+
+            $.ajax({
+                url: "/paket/payment",
+                type: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                 },
-                onPending: function(result) {
-                    document.getElementById('result-json').innerHTML += JSON.stringify(
-                        result, null, 2);
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id
                 },
-                onError: function(result) {
-                    document.getElementById('result-json').innerHTML += JSON.stringify(
-                        result, null, 2);
+                success: function(response) {
+                    $("#loader").hide(); // Sembunyikan loader sebelum snap muncul
+
+                    snap.pay(response['snap_token'], {
+                        onSuccess: function(result) {
+                            window.location.href = 'paket/payment/success/' + response['snap_token'];
+                        },
+                        onPending: function(result) {
+                            console.log("Pending:", result);
+                        },
+                        onError: function(result) {
+                            console.log("Error:", result);
+                            Swal.fire("Gagal!", "Transaksi gagal atau dibatalkan.", "error");
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    $("#loader").hide(); // Sembunyikan loader saat gagal
+                    Swal.fire(
+                        "Gagal!",
+                        "Terjadi kesalahan saat memproses data.",
+                        "error"
+                    );
                 }
             });
         }
-        // function bayar(id) {
-        //     $.ajax({
-        //         url: "/paket/payment/" + id,
-        //         type: "GET",
-        //         headers: {
-        //             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-        //         },
-        //         data: {
-        //             _token: "{{ csrf_token() }}",
-        //         },
-        //         success: function(response) {
-        //             snap.pay(id, {
-        //                 onSuccess: function(result) {
-        //                     window.location.href = 'paketLaundryMember/bayar/success/' + id;
-        //                 },
-        //                 onPending: function(result) {
-        //                     document.getElementById('result-json').innerHTML += JSON.stringify(
-        //                         result, null, 2);
-        //                 },
-        //                 onError: function(result) {
-        //                     document.getElementById('result-json').innerHTML += JSON.stringify(
-        //                         result, null, 2);
-        //                 }
-        //             });
-        //         },
-        //         error: function(xhr) {
-        //             Swal.fire(
-        //                 "Gagal!",
-        //                 "Terjadi kesalahan saat memproses data.",
-        //                 "error"
-        //             );
-        //         }
-        //     });
-        // }
     </script>
-
 </body>
 
 </html>

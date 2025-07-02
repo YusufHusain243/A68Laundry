@@ -17,7 +17,7 @@ class KeranjangController extends Controller
             $jumlahKeranjang = Keranjang::where('user_id', auth()->user()->id)
                 ->where('status', '0')
                 ->count();
-            return view('customers.keranjang', compact('keranjangs','jumlahKeranjang'));
+            return view('customers.keranjang', compact('keranjangs', 'jumlahKeranjang'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to retrieve cart items.']);
         }
@@ -44,7 +44,8 @@ class KeranjangController extends Controller
         }
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         try {
             $keranjang = Keranjang::findOrFail($id);
             $keranjang->delete();
@@ -54,14 +55,27 @@ class KeranjangController extends Controller
         }
     }
 
-    public function cekout(Request $request)
+    public function checkout(Request $request)
     {
-        $selectedIds = $request->input('keranjang_ids', []);
+        $keranjangIds = $request->keranjang_ids;
+        $metodePembayaran = $request->metode_pembayaran; 
 
-        if (empty($selectedIds)) {
-            return redirect()->back()->with('error', 'Tidak ada item yang dipilih.');
-        }
+        return $this->paymentTransfer($keranjangIds, $metodePembayaran);
+    }
 
-        return redirect()->route('/keranjang'); 
+    private function paymentTransfer($keranjangIds, $metodePembayaran)
+    {
+        $jenisLaundry = Keranjang::whereIn('id', $keranjangIds)
+            ->with('jenisLaundry')
+            ->get();
+            dd($jenisLaundry[0]->jenisLaundry);
+    }
+
+    private function paymentPaket($keranjangIds, $metodePembayaran)
+    {
+        // Implementasi logika pembayaran paket
+        // Misalnya, mengupdate status keranjang menjadi '2' (paket dibeli)
+        Keranjang::whereIn('id', $keranjangIds)->update(['status' => '2']);
+        return redirect()->back()->with('success', 'Paket berhasil dibeli.');
     }
 }
