@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Keranjang;
+use App\Models\Orderan;
+use App\Models\OrderanOnline;
 use Illuminate\Http\Request;
 
 class KeranjangController extends Controller
@@ -60,15 +62,45 @@ class KeranjangController extends Controller
         $keranjangIds = $request->keranjang_ids;
         $metodePembayaran = $request->metode_pembayaran; 
 
-        return $this->paymentTransfer($keranjangIds, $metodePembayaran);
+        if ($metodePembayaran == 'Transfer') {
+            return $this->paymentTransfer($keranjangIds, $metodePembayaran);
+        }else{
+            return $this->paymentPaket($keranjangIds, $metodePembayaran);
+        }
     }
 
     private function paymentTransfer($keranjangIds, $metodePembayaran)
     {
-        $jenisLaundry = Keranjang::whereIn('id', $keranjangIds)
-            ->with('jenisLaundry')
-            ->get();
-            dd($jenisLaundry[0]->jenisLaundry);
+        try {
+            $keranjangLaundry = Keranjang::whereIn('id', $keranjangIds)
+                ->where('user_id', auth()->user()->id)
+                ->get();
+
+            foreach ($keranjangLaundry as $jenisLaundry) {
+                dd($jenisLaundry->jenisLaundry->nama);
+                $orderan = Orderan::create([
+                    'jenis_laundry_id'      => $jenisLaundry->jenisLaundry->id,
+                    'kode_order'            => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8) . '_' . time(),
+                    'berat'                 => $jenisLaundry->jenisLaundry->berat,
+                    'harga'                 => $jenisLaundry->jenisLaundry->harga,
+                    'metode_pembayaran'     => 'Transfer',
+                    'is_offline'            => '0',
+                    'is_paket'              => '0',
+                    'status'                => '0',
+                ]);
+    
+                $this->updateData($orderan->id, 'Menunggu Set Lokasi', 'Belum Lunas');
+    
+                OrderanOnline::create([
+                    'orderan_id' => $orderan->id,
+                    'user_id'   => auth()->user()->id,
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Order berhasil dibuat.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     private function paymentPaket($keranjangIds, $metodePembayaran)
