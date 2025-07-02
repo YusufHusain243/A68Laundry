@@ -69,13 +69,35 @@ class KeranjangController extends Controller
     public function checkout(Request $request)
     {
         $keranjangIds = $request->keranjang_ids;
-        $metodePembayaran = $request->metode_pembayaran;
-        $paketId = $request->paket_id;
 
-        if ($metodePembayaran == 'Transfer') {
-            return $this->paymentTransfer($keranjangIds, $metodePembayaran);
-        } else {
-            return $this->paymentPaket($keranjangIds, $metodePembayaran, $paketId);
+        try {
+            $keranjangLaundry = Keranjang::whereIn('id', $keranjangIds)
+                ->where('user_id', Auth::user()->id)
+                ->get();
+
+            foreach ($keranjangLaundry as $jenisLaundry) {
+                $orderan = Orderan::create([
+                    'jenis_laundry_id'      => $jenisLaundry->jenisLaundry->id,
+                    'kode_order'            => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8) . '_' . time(),
+                    'berat'                 => $jenisLaundry->jenisLaundry->berat,
+                    'harga'                 => $jenisLaundry->jenisLaundry->harga,
+                    'metode_pembayaran'     => 'Transfer',
+                    'is_offline'            => '0',
+                    'is_paket'              => '0',
+                    'status'                => '0',
+                ]);
+
+                OrderanOnline::create([
+                    'orderan_id' => $orderan->id,
+                    'user_id'   => Auth::user()->id,
+                ]);
+
+                Keranjang::where('id', $jenisLaundry->id)->update(['status' => '1']);
+            }
+
+            return redirect()->back()->with('success', 'Order berhasil dibuat.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -90,8 +112,6 @@ class KeranjangController extends Controller
                 $orderan = Orderan::create([
                     'jenis_laundry_id'      => $jenisLaundry->jenisLaundry->id,
                     'kode_order'            => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8) . '_' . time(),
-                    'berat'                 => $jenisLaundry->jenisLaundry->berat,
-                    'harga'                 => $jenisLaundry->jenisLaundry->harga,
                     'metode_pembayaran'     => 'Transfer',
                     'is_offline'            => '0',
                     'is_paket'              => '0',

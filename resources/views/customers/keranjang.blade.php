@@ -97,12 +97,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="row justify-content-end mt-4">
-                        <div class="col-md-12">
-                            <a href="/setLocation" class="btn btn-black btn-lg py-3 btn-block">Atur Lokasi Jemput</a>
-                        </div>
-                    </div>
                     
                     <div class="row justify-content-end mt-4">
                         <div class="col-md-12">
@@ -133,12 +127,10 @@
         // Validasi sebelum submit
         function validateForm() {
             const checkedItems = document.querySelectorAll('.item-checkbox:checked');
-
             if (checkedItems.length === 0) {
                 alert('Silakan pilih minimal 1 item untuk melanjutkan checkout.');
                 return false;
             }
-
             return true;
         }
     </script>

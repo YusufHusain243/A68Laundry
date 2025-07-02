@@ -85,6 +85,7 @@ class CustomerController extends Controller
     
     public function transaksi(){
         $orderan = OrderanOnline::where('user_id', Auth::user()->id)
+            ->with('orderan.jenisLaundry')
             ->get();
         $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
