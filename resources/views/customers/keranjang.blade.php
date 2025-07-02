@@ -98,39 +98,10 @@
                         </table>
                     </div>
 
-                    <!-- Metode Pembayaran -->
-                    <div class="mt-4">
-                        <h5>Pilih Metode Pembayaran:</h5>
-                        <div class="form-check">
-                            <input class="form-check-input payment-method" type="radio" name="metode_pembayaran"
-                                id="transfer" value="Transfer">
-                            <label class="form-check-label" for="transfer">Transfer</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input payment-method" type="radio" name="metode_pembayaran"
-                                id="paket" value="Paket">
-                            <label class="form-check-label" for="paket">Paket</label>
-                        </div>
-                    </div>
-
-                    <!-- Dropdown Paket (muncul hanya jika metode Paket dipilih) -->
-                    <div class="mt-3" id="paketDropdown" style="display: none;">
-                        <label for="paket_id">Pilih Paket:</label>
-                        <select name="paket_id" id="paket_id" class="form-control">
-                            <option value="">-- Pilih Paket --</option>
-                            @foreach ($paketCustomer as $paket)
-                                <option value="{{ $paket->id }}">
-                                    {{ $paket->paketLaundry->jenislaundry->nama }} - Sisa: {{ $paket->kg_sisa }} KG
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
                     <!-- Tombol Checkout -->
                     <div class="row justify-content-end mt-4">
                         <div class="col-md-12">
-                            <button id="checkoutButton" type="submit" class="btn btn-black btn-lg py-3 btn-block"
-                                style="display: none;">
+                            <button id="checkoutButton" type="submit" class="btn btn-black btn-lg py-3 btn-block">
                                 Checkout
                             </button>
                         </div>
@@ -154,43 +125,13 @@
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
-        const paymentRadios = document.querySelectorAll('.payment-method');
-        const checkoutBtn = document.getElementById('checkoutButton');
-        const paketDropdown = document.getElementById('paketDropdown');
-
-        // Show/hide paket dropdown + show checkout button
-        paymentRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (radio.value === 'Paket') {
-                    paketDropdown.style.display = 'block';
-                } else {
-                    paketDropdown.style.display = 'none';
-                }
-                checkoutBtn.style.display = 'block';
-            });
-        });
-
         // Validasi sebelum submit
         function validateForm() {
             const checkedItems = document.querySelectorAll('.item-checkbox:checked');
-            const selectedPayment = document.querySelector('input[name="metode_pembayaran"]:checked');
 
             if (checkedItems.length === 0) {
                 alert('Silakan pilih minimal 1 item untuk melanjutkan checkout.');
                 return false;
-            }
-
-            if (!selectedPayment) {
-                alert('Silakan pilih metode pembayaran.');
-                return false;
-            }
-
-            if (selectedPayment.value === 'Paket') {
-                const paketId = document.getElementById('paket_id').value;
-                if (!paketId) {
-                    alert('Silakan pilih paket yang ingin digunakan.');
-                    return false;
-                }
             }
 
             return true;

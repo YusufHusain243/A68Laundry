@@ -25,8 +25,11 @@ class CustomerController extends Controller
 
     public function profileCustomer()
     {
+        $jumlahKeranjang = Auth::check() ? Keranjang::where('user_id', Auth::user()->id)
+            ->where('status', '0')
+            ->count() : 0;
         $profile = User::where('id', Auth::user()->id)->first();
-        return view('customers.profile', compact('profile'));
+        return view('customers.profile', compact('profile', 'jumlahKeranjang'));
     }
 
     public function updateProfile(Request $request)
