@@ -27,6 +27,7 @@ class KeranjangController extends Controller
                 ->where('status_pembayaran', 'Lunas')
                 ->where('kg_sisa', '>', '0')
                 ->get();
+
             return view('customers.keranjang', compact('keranjangs', 'jumlahKeranjang', 'paketCustomer'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to retrieve cart items.']);

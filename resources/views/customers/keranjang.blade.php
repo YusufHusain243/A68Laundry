@@ -98,7 +98,12 @@
                         </table>
                     </div>
 
-                    <!-- Tombol Checkout -->
+                    <div class="row justify-content-end mt-4">
+                        <div class="col-md-12">
+                            <a href="/setLocation" class="btn btn-black btn-lg py-3 btn-block">Atur Lokasi Jemput</a>
+                        </div>
+                    </div>
+                    
                     <div class="row justify-content-end mt-4">
                         <div class="col-md-12">
                             <button id="checkoutButton" type="submit" class="btn btn-black btn-lg py-3 btn-block">
