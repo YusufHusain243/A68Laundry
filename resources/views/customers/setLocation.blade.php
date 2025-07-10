@@ -81,7 +81,7 @@
 
         <div id="map" class="mb-3"></div>
 
-        <form action="/orderLangsung/updateLocation" method="post" class="text-center">
+        <form action="/updateLocation" method="post" class="text-center">
             @csrf
             <input type="hidden" name="id" value="{{ $id }}">
             <input type="hidden" name="latitudeInput" id="latitudeInput" />
@@ -91,6 +91,7 @@
         </form>
 
         <div id="distance" class="mt-3 text-center fw-semibold text-dark"></div>
+        <div id="price" class="mt-3 text-center fw-semibold text-dark"></div>
     </div>
 
     <script>
@@ -112,6 +113,7 @@
         const disInput = document.getElementById('distanceInput');
 
         const distanceEl = document.getElementById('distance');
+        const price = document.getElementById('price');
         const suggestionsEl = document.getElementById('suggestions');
         const loadingEl = document.getElementById('loading');
         const searchInput = document.getElementById('search-input');
@@ -133,6 +135,9 @@
                     if (data.routes && data.routes.length) {
                         const distKm = (data.routes[0].legs[0].distance / 1000).toFixed(2);
                         distanceEl.textContent = `Jarak: ${distKm} km`;
+                        // Format harga ongkir ke rupiah
+                        const ongkir = distKm * 5000;
+                        price.textContent = `Ongkir: Rp ${ongkir.toLocaleString('id-ID')}`;
                         disInput.value = distKm;
                     } else {
                         distanceEl.textContent = 'Jarak: Tidak tersedia';
@@ -146,7 +151,7 @@
         // Search locations within bounding box
         function searchLocations(query) {
             const viewbox = '113.8500,-2.0800,114.0600,-2.3100'; // bounding box Palangka Raya
-            const url = `/orderLangsung/geocode?q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=1`;
+            const url = `/geocode?q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=1`;
 
             loadingEl.style.display = 'block';
             suggestionsEl.innerHTML = '';

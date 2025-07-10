@@ -87,22 +87,31 @@
                                     @if ($o->orderan->metode_pembayaran)
                                         {{ $o->orderan->metode_pembayaran }}
                                     @else
-                                        <form action="" method="POST" style="display:inline;">
-                                            @csrf
-                                            <select name="metode_pembayaran"
-                                                class="form-select form-select-sm d-inline w-auto" required>
-                                                <option value="" disabled selected>Pilih Metode</option>
-                                                <option value="paket">Paket</option>
-                                                <option value="Transfer">Transfer</option>
-                                            </select>
-                                        </form>
+                                        @if ($o->orderan->harga)
+                                            <form action="" method="POST">
+                                                @csrf
+                                                <select name="metode_pembayaran"
+                                                    class="form-select form-select-sm d-inline w-auto" required>
+                                                    <option value="" disabled selected>Pilih Metode</option>
+                                                    <option value="paket">Paket</option>
+                                                    <option value="Transfer">Transfer</option>
+                                                </select>
+                                            </form>
+                                        @else
+                                            <span class="badge bg-warning">Menunggu Harga</span>
+                                        @endif
                                     @endif
                                 </td>
                                 <td>
                                     @if ($o->jarak)
-                                        <a href="{{ $o->jarak }}" target="_blank">Link Gmaps</a>
+                                        <ul>
+                                            <li><a href="https://www.google.com/maps/search/?api=1&query={{ $o->latitude }},{{ $o->longitude }}"
+                                                    target="_blank">Link Gmaps</a></li>
+                                            <li><a href="/setLocation/{{ $o->orderan->id }}">Update Lokasi</a></li>
+                                        </ul>
                                     @else
-                                        <a href="" class="btn btn-sm btn-primary">Set Lokasi</a>
+                                        <a href="/setLocation/{{ $o->orderan->id }}" class="btn btn-sm btn-primary">Set
+                                            Lokasi</a>
                                     @endif
                                 </td>
                                 <td>

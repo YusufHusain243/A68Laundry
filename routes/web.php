@@ -15,22 +15,22 @@ use Illuminate\Support\Facades\Route;
 // GUEST 
 // =================================================
 // Route::middleware(['guest'])->group(function () {
-    // landing page 
-    Route::get('/', [CustomerController::class, 'index']);
+// landing page 
+Route::get('/', [CustomerController::class, 'index']);
 
-    //auth customer
-    Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
-    Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
-    Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
-    Route::post('/registerCustomer', [AuthController::class, 'registerCustomerStore']);
+//auth customer
+Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
+Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
+Route::get('/registerCustomer', [AuthController::class, 'registerCustomer']);
+Route::post('/registerCustomer', [AuthController::class, 'registerCustomerStore']);
 
-    // loginStaff
-    Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
-    Route::post('/loginStaffAuth', [AuthController::class, 'loginStaffAuth']);
+// loginStaff
+Route::get('/loginStaff', [AuthController::class, 'loginStaff']);
+Route::post('/loginStaffAuth', [AuthController::class, 'loginStaffAuth']);
 
-    // loginOwner
-    Route::get('/loginOwner', [AuthController::class, 'loginOwner']);
-    Route::post('/loginOwnerAuth', [AuthController::class, 'loginOwnerAuth']);
+// loginOwner
+Route::get('/loginOwner', [AuthController::class, 'loginOwner']);
+Route::post('/loginOwnerAuth', [AuthController::class, 'loginOwnerAuth']);
 // });
 
 // OWNER
@@ -109,4 +109,7 @@ Route::middleware(['customer'])->group(function () {
 
     //transaksi
     Route::get('/transaksiSaya', [CustomerController::class, 'transaksi']);
+    Route::get('/setLocation/{id}', [CustomerController::class, 'setLocation']);
+    Route::get('/geocode', [CustomerController::class, 'search']);
+    Route::post('/updateLocation', [CustomerController::class, 'updateLocation']);
 });

@@ -10,6 +10,9 @@ use App\Models\PaketLaundry;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -91,5 +94,68 @@ class CustomerController extends Controller
             ->where('status', '0')
             ->count();
         return view('customers.transaksi', compact('orderan','jumlahKeranjang'));
+    }
+
+     public function setLocation($id)
+    {
+        return view('customers.setLocation', compact('id'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->query('q');
+        if (!$query) {
+            return response()->json([]);
+        }
+        $cacheKey = 'geocode:' . md5($query);
+        $results = Cache::remember($cacheKey, 600, function () use ($query) {
+            try {
+                $response = Http::withHeaders([
+                    'User-Agent' => 'MyLaravelApp/1.0 (a68laundry@gmail.com)',
+                ])->get('https://nominatim.openstreetmap.org/search', [
+                    'format' => 'json',
+                    'q' => $query,
+                    'addressdetails' => 1,
+                    'limit' => 5,
+                ]);
+                if ($response->successful()) {
+                    return $response->json();
+                }
+                return [];
+            } catch (\Exception $e) {
+                Log::error('Geocoding error: ' . $e->getMessage());
+                return [];
+            }
+        });
+        return response()->json($results);
+    }
+
+    public function updateLocation(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required',
+                'latitudeInput' => 'required',
+                'longitudeInput' => 'required',
+                'distanceInput' => 'required',
+            ]);
+
+            OrderanOnline::where('orderan_id', $request->id)->update([
+                'latitude' => $request->latitudeInput,
+                'longitude' => $request->longitudeInput,
+                'jarak' => $request->distanceInput,
+                'ongkir' => $request->distanceInput * 5000,
+            ]);
+
+            self::updateData(
+                $request->id,
+                'Lokasi Jemput Diperbarui',
+                null
+            );
+
+            return redirect('/transaksiSaya')->with('success', 'Lokasi berhasil diperbarui');
+        } catch (\Exception $e) {
+            return redirect('/transaksiSaya')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }
