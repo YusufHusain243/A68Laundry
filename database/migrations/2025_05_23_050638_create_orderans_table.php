@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('kode_order');
             $table->string('berat')->nullable();
             $table->string('harga')->nullable();
-            $table->string('metode_pembayaran');
+            $table->string('metode_pembayaran')->nullable();
             $table->string('is_offline');
             $table->string('is_paket');
             $table->string('snap_token')->nullable();

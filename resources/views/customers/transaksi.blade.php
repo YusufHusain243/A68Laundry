@@ -63,12 +63,11 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" id="checkAll"></th>
-                            <th>Gambar</th>
                             <th>Kode Order</th>
                             <th>Berat Laundry</th>
                             <th>Harga Laundry</th>
-                            <th>Pembayaran</th>
+                            <th>Metode Pembayaran</th>
+                            <th>Lokasi</th>
                             <th>Status Pembayaran</th>
                             <th>Status Cucian</th>
                             <th>Aksi</th>
@@ -77,20 +76,70 @@
                     <tbody>
                         @foreach ($orderan as $o)
                             <tr>
-                                <td>
-                                    <input type="checkbox" name="transaksi_ids[]" value="{{ $o->id }}"
-                                        class="item-checkbox">
-                                </td>
-                                <td class="product-thumbnail">
-                                    <img src="{{ asset('images/' . $o->orderan->jenisLaundry->foto) }}" alt="Image"
-                                        width="200px" class="img-fluid">
-                                </td>
                                 <td>{{ $o->orderan->kode_order }}</td>
-                                <td>{{ $o->orderan->berat ? $o->orderan->berat . ' kg' : 'Menunggu Berat Diinputkan Oleh Admin Laundry' }}</td>
-                                <td>{{ $o->orderan->harga ? $o->orderan->harga : 'Menunggu Harga Diinputkan Oleh Admin Laundry' }}</td>
-                                <td>{{ $o->orderan->metode_pembayaran ? $o->orderan->metode_pembayaran : 'Anda Belum Mengatur Metode Pembayaran Untuk Transaksi Ini' }}</td>
                                 <td>
-                                    <a href="/transaksi/destroy/{{ $o->id }}" class="btn btn-black btn-sm">X</a>
+                                    {!! $o->orderan->berat ? $o->orderan->berat . ' kg' : '<span class="badge bg-warning">Menunggu Berat</span>' !!}
+                                </td>
+                                <td>
+                                    {!! $o->orderan->harga ? 'Rp' . $o->orderan->harga : '<span class="badge bg-warning">Menunggu Harga</span>' !!}
+                                </td>
+                                <td>
+                                    @if ($o->orderan->metode_pembayaran)
+                                        {{ $o->orderan->metode_pembayaran }}
+                                    @else
+                                        <form action="" method="POST" style="display:inline;">
+                                            @csrf
+                                            <select name="metode_pembayaran"
+                                                class="form-select form-select-sm d-inline w-auto" required>
+                                                <option value="" disabled selected>Pilih Metode</option>
+                                                <option value="paket">Paket</option>
+                                                <option value="Transfer">Transfer</option>
+                                            </select>
+                                        </form>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($o->jarak)
+                                        <a href="{{ $o->jarak }}" target="_blank">Link Gmaps</a>
+                                    @else
+                                        <a href="" class="btn btn-sm btn-primary">Set Lokasi</a>
+                                    @endif
+                                </td>
+                                <td>
+                                    <ul>
+                                        @foreach ($o->orderan->statusPembayaran as $sp)
+                                            <li>
+                                                <b>{{ $sp->status }}</b><br>
+                                                {{ $sp->tgl }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        @foreach ($o->orderan->statusCucian as $sc)
+                                            <li>
+                                                <b>{{ $sc->status }}</b><br>
+                                                {{ $sc->tgl }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                            id="aksiDropdown{{ $o->id }}" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fas fa-bars"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="aksiDropdown{{ $o->id }}">
+                                            <li>
+                                                <a class="dropdown-item" href="">
+                                                    <i class="fas fa-eye"></i> Set Lokasi
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -106,24 +155,6 @@
     <script src="{{ asset('assets_customers/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets_customers/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets_customers/js/custom.js') }}"></script>
-
-    <script>
-        // Checkbox Select All
-        document.getElementById('checkAll').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.item-checkbox');
-            checkboxes.forEach(cb => cb.checked = this.checked);
-        });
-
-        // Validasi sebelum submit
-        function validateForm() {
-            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
-            if (checkedItems.length === 0) {
-                alert('Silakan pilih minimal 1 item untuk melanjutkan checkout.');
-                return false;
-            }
-            return true;
-        }
-    </script>
 </body>
 
 </html>

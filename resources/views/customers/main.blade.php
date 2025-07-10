@@ -83,8 +83,18 @@
 
                     snap.pay(response['snap_token'], {
                         onSuccess: function(result) {
-                            window.location.href = 'paket/payment/success/' + response[
-                            'snap_token'];
+                            $("#loader").css("display", "flex");
+                            $.ajax({
+                                url: '/paket/payment/success/' + response['snap_token'],
+                                type: 'GET',
+                                success: function(res) {
+                                    window.location.href = '/paket/payment/success/' + response['snap_token'];
+                                },
+                                error: function(xhr) {
+                                    $("#loader").hide();
+                                    Swal.fire("Gagal!", "Terjadi kesalahan saat memproses data.", "error");
+                                }
+                            });
                         },
                         onPending: function(result) {
                             console.log("Pending:", result);

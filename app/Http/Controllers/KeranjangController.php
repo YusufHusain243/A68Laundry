@@ -40,6 +40,7 @@ class KeranjangController extends Controller
             // Check if the entry already exists
             $exists = Keranjang::where('jenis_laundry_id', $id)
                 ->where('user_id', Auth::user()->id)
+                ->where('status', '0')
                 ->exists();
 
             if (!$exists) {
@@ -79,9 +80,6 @@ class KeranjangController extends Controller
                 $orderan = Orderan::create([
                     'jenis_laundry_id'      => $jenisLaundry->jenisLaundry->id,
                     'kode_order'            => substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 8) . '_' . time(),
-                    'berat'                 => $jenisLaundry->jenisLaundry->berat,
-                    'harga'                 => $jenisLaundry->jenisLaundry->harga,
-                    'metode_pembayaran'     => 'Transfer',
                     'is_offline'            => '0',
                     'is_paket'              => '0',
                     'status'                => '0',
@@ -93,6 +91,12 @@ class KeranjangController extends Controller
                 ]);
 
                 Keranjang::where('id', $jenisLaundry->id)->update(['status' => '1']);
+
+                self::updateData(
+                    $orderan->id,
+                    'Orderan Masuk',
+                    'Menunggu Pembayaran'
+                );
             }
 
             return redirect()->back()->with('success', 'Order berhasil dibuat.');
