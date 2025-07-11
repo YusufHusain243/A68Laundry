@@ -6,7 +6,7 @@
     <div class="pc-content">
         <div class="row">
             <div class="col-xl-12 col-md-12">
-                 @if (session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -64,7 +64,8 @@
                         <input type="hidden" name="jenisLaundryId" id="jenisLaundryId">
                         <div class="mb-3">
                             <label for="jenis_laundry" class="form-label">Jenis Laundry</label>
-                            <input type="text" class="form-control" id="jenis_laundry" name="jenis_laundry" disabled readonly>
+                            <input type="text" class="form-control" id="jenis_laundry" name="jenis_laundry" disabled
+                                readonly>
                         </div>
                         <div class="mb-3">
                             <label for="berat" class="form-label">Berat</label>
@@ -132,7 +133,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="berat_detail" class="form-label">Berat</label>
-                        <input type="number" step="0.1" class="form-control" id="berat_detail" name="berat_detail">
+                        <input type="number" step="0.1" class="form-control" id="berat_detail"
+                            name="berat_detail">
                     </div>
                     <div class="mb-3">
                         <label for="harga_detail" class="form-label">Total Biaya</label>
@@ -187,7 +189,9 @@
                         render: function(data, type, row) {
                             let statusList = '<ul>';
                             data.forEach(function(status) {
-                                 statusList += '<li><strong>' + String(status.status) + '</strong><br>' + String(status.tgl) + '</li>'; // Added missing concatenation operator (+) after status.tgl
+                                statusList += '<li><strong>' + String(status.status) +
+                                    '</strong><br>' + String(status.tgl) +
+                                    '</li>'; // Added missing concatenation operator (+) after status.tgl
                             });
                             statusList += '</ul>';
                             return statusList;
@@ -198,7 +202,9 @@
                         render: function(data, type, row) {
                             let statusList = '<ul>';
                             data.forEach(function(status) {
-                                statusList += '<li><strong>' + String(status.status) + '</strong><br>' + String(status.tgl) + '</li>'; // Added missing concatenation operator (+) after status.tgl
+                                statusList += '<li><strong>' + String(status.status) +
+                                    '</strong><br>' + String(status.tgl) +
+                                    '</li>'; // Added missing concatenation operator (+) after status.tgl
                             });
                             statusList += '</ul>';
                             return statusList;
@@ -207,33 +213,39 @@
                     {
                         data: 'id',
                         render: function(data, type, row) {
-                            let statusCucian = row.status_cucian[row.status_cucian.length - 1].status;
-                            let statusPembayaran = row.status_pembayaran[row.status_pembayaran.length - 1].status;
+                            let statusCucian = row.status_cucian[row.status_cucian.length - 1]
+                                .status;
+                            let statusPembayaran = row.status_pembayaran[row.status_pembayaran
+                                .length - 1].status;
                             let dropdownItems = '';
 
                             dropdownItems += `
                                 <button class="dropdown-item" type="button" onclick="detailData('${row.id}')">Detail</button>
                             `;
 
-                            if (statusCucian === 'Menunggu Cucian Diambil') {
+                            if (statusCucian === 'Lokasi Jemput Diperbarui') {
                                 dropdownItems +=
                                     `<button class="dropdown-item" type="button" onclick="ambilCucian('${row.id}')">Ambil Cucian</button>`;
                             }
-                            
+
                             if (statusCucian === 'Cucian Diambil') {
                                 dropdownItems +=
                                     `<button class="dropdown-item" type="button" onclick="inputTimbangan('${row.id}')">Input Timbangan</button>`;
                             }
-                            
-                            if (statusCucian === 'Sedang Dicuci') {
-                                dropdownItems +=
-                                    `<button class="dropdown-item" type="button" onclick="cuciSelesai('${row.id}')">Cuci Selesai</button>`;
-                            }
 
-                            if (statusCucian === 'Cucian Selesai') {
+                            if (statusCucian === 'Cucian Diproses') {
                                 dropdownItems +=
                                     `<button class="dropdown-item" type="button" onclick="antarCucian('${row.id}')">Antar Cucian</button>`;
                             }
+                            // if (statusCucian === 'Cucian Diproses') {
+                            //     dropdownItems +=
+                            //         `<button class="dropdown-item" type="button" onclick="cuciSelesai('${row.id}')">Cuci Selesai</button>`;
+                            // }
+
+                            // if (statusCucian === 'Cucian Selesai') {
+                            //     dropdownItems +=
+                            //         `<button class="dropdown-item" type="button" onclick="antarCucian('${row.id}')">Antar Cucian</button>`;
+                            // }
 
                             return `
                                 <div class="dropdown">
@@ -266,7 +278,8 @@
                 $('#jenis_laundry_id').val(data.jenis_laundry_id).prop('disabled', true).trigger('change');
                 $('#jarak').val(data.orderan_online.jarak).prop('disabled', true);
                 $('#ongkir').val(data.orderan_online.ongkir).prop('disabled', true);
-                $('#lokasi').attr('href', 'https://www.google.com/maps/search/?api=1&query=' + data.orderan_online.latitude + ',' + data.orderan_online.longitude);
+                $('#lokasi').attr('href', 'https://www.google.com/maps/search/?api=1&query=' + data.orderan_online
+                    .latitude + ',' + data.orderan_online.longitude);
                 $('#berat_detail').val(data.berat).prop('disabled', true);
                 $('#harga_detail').val(data.harga).prop('disabled', true);
                 $('#metode_pembayaran').val(data.metode_pembayaran).prop('disabled', true).trigger('change');
@@ -274,7 +287,7 @@
             }
         }
 
-        function alert(label, desc, icon, url, id){
+        function alert(label, desc, icon, url, id) {
             Swal.fire({
                 title: label,
                 text: desc,
@@ -328,12 +341,12 @@
             });
         }
 
-        function ambilCucian(id){
+        function ambilCucian(id) {
             alert(
-                'Konfirmasi Ambil Cucian', 
-                'Apakah Anda yakin ingin mengambil cucian ini?', 
-                'question', 
-                '/orderanOnline/ambilCucian/', 
+                'Konfirmasi Ambil Cucian',
+                'Apakah Anda yakin ingin mengambil cucian ini?',
+                'question',
+                '/orderanOnline/ambilCucian/',
                 id
             );
         }
@@ -349,22 +362,22 @@
             }
         }
 
-        function cuciSelesai(id){
+        function cuciSelesai(id) {
             alert(
-                'Konfirmasi Cucian Selesai', 
-                'Apakah Anda yakin ingin menyelesaikan cucian ini?', 
-                'question', 
-                '/orderanOnline/cuciSelesai/', 
+                'Konfirmasi Cucian Selesai',
+                'Apakah Anda yakin ingin menyelesaikan cucian ini?',
+                'question',
+                '/orderanOnline/cuciSelesai/',
                 id
             );
         }
-        
-        function antarCucian(id){
+
+        function antarCucian(id) {
             alert(
-                'Konfirmasi Antar Cucian', 
-                'Apakah Anda yakin ingin mengantar cucian ini?', 
-                'question', 
-                '/orderanOnline/antarCucian/', 
+                'Konfirmasi Antar Cucian',
+                'Apakah Anda yakin ingin mengantar cucian ini?',
+                'question',
+                '/orderanOnline/antarCucian/',
                 id
             );
         }

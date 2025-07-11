@@ -7,12 +7,15 @@ use App\Models\Keranjang;
 use App\Models\Orderan;
 use App\Models\OrderanOnline;
 use App\Models\PaketLaundry;
+use App\Models\StatusCucian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class CustomerController extends Controller
 {
@@ -70,33 +73,51 @@ class CustomerController extends Controller
         }
     }
 
-    public function laundry(){
+    public function cucianSelesai($id)
+    {
+        try {
+            StatusCucian::create([
+                'orderan_id' => $id,
+                'status' => 'Cucian Selesai',
+                'tgl' => now(),
+            ]);
+
+            return redirect('/transaksiSaya')->with('success', 'Status cucian berhasil diperbarui menjadi selesai.');
+        } catch (\Exception $e) {
+            return redirect('/transaksiSaya')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function laundry()
+    {
         $laundry = JenisLaundry::all();
         $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
-        return view('customers.laundry', compact('laundry','jumlahKeranjang'));
+        return view('customers.laundry', compact('laundry', 'jumlahKeranjang'));
     }
-    
-    public function paket(){
+
+    public function paket()
+    {
         $paket = PaketLaundry::all();
         $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
-        return view('customers.paket', compact('paket','jumlahKeranjang'));
+        return view('customers.paket', compact('paket', 'jumlahKeranjang'));
     }
-    
-    public function transaksi(){
+
+    public function transaksi()
+    {
         $orderan = OrderanOnline::where('user_id', Auth::user()->id)
             ->with('orderan.jenisLaundry')
             ->get();
         $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
-        return view('customers.transaksi', compact('orderan','jumlahKeranjang'));
+        return view('customers.transaksi', compact('orderan', 'jumlahKeranjang'));
     }
 
-     public function setLocation($id)
+    public function setLocation($id)
     {
         return view('customers.setLocation', compact('id'));
     }
@@ -156,6 +177,85 @@ class CustomerController extends Controller
             return redirect('/transaksiSaya')->with('success', 'Lokasi berhasil diperbarui');
         } catch (\Exception $e) {
             return redirect('/transaksiSaya')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function batalkanOrder($id)
+    {
+        try {
+            $orderan = Orderan::where('id', $id)->first();
+            if ($orderan) {
+                $orderan->delete();
+                return redirect('/transaksiSaya')->with('success', 'Order berhasil dibatalkan.');
+            } else {
+                return redirect('/transaksiSaya')->with('error', 'Order tidak ditemukan.');
+            }
+        } catch (\Exception $e) {
+            return redirect('/transaksiSaya')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function setMetodePembayaran($id, Request $request)
+    {
+        try {
+            $orderan = Orderan::findOrFail($id);
+            $orderan->update(['metode_pembayaran' => $request->metode_pembayaran]);
+            return response()->json(['success' => true, 'message' => 'Metode pembayaran berhasil diubah.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $orderan = Orderan::findOrFail($request->input('id'));
+
+            Config::$serverKey = config('midtrans.serverKey');
+            Config::$isProduction = false;
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => rand(),
+                    'gross_amount' => $orderan->harga + $orderan->orderanOnline->ongkir,
+                ),
+                'customer_details' => array(
+                    'first_name' => auth()->user()->nama,
+                    'phone'      => auth()->user()->no_hp,
+                    'email'      => auth()->user()->email,
+                    'address'    => auth()->user()->alamat,
+                )
+            );
+
+            $snapToken = Snap::getSnapToken($params);
+
+            $orderan->update([
+                'snap_token' => $snapToken,
+            ]);
+
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat melakukan pembayaran: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function paymentSuccess($snap)
+    {
+        try {
+            $orderan = Orderan::where('snap_token', $snap)->firstOrFail();
+            self::updateData(
+                $orderan->id,
+                'Cucian Diproses',
+                'Pembayaran Berhasil',
+            );
+            return redirect()->back()->with('success', 'Pembayaran berhasil');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Pembayaran gagal: ' . $e->getMessage());
         }
     }
 }

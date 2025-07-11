@@ -99,9 +99,9 @@ class KeranjangController extends Controller
                 );
             }
 
-            return redirect()->back()->with('success', 'Order berhasil dibuat.');
+            return redirect('/transaksiSaya')->with('success', 'Order berhasil dibuat.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect('/transaksiSaya')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

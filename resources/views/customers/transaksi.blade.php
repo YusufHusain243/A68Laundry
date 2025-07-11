@@ -8,7 +8,9 @@
     <meta name="description" content="" />
 
     <!-- Bootstrap CSS -->
-    <link href="{{ asset('assets_customers/css/bootstrap.min.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('assets_customers/css/bootstrap.min.css') }}" rel="stylesheet"> --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="{{ asset('assets_customers/css/tiny-slider.css') }}" rel="stylesheet">
     <link href="{{ asset('assets_customers/css/style.css') }}" rel="stylesheet">
@@ -57,15 +59,19 @@
     </div>
 
     <!-- Main Section -->
-    <div class="untree_co-section before-footer-section">
-        <div class="container">
-            <div class="row mb-5">
+    {{-- <div class="untree_co-section before-footer-section"> --}}
+    <div class="container-fluid mt-5 mb-5" style="max-width: 90vw;">
+        <div class="row">
+            <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
                             <th>Kode Order</th>
+                            <th>Jenis Laundry</th>
                             <th>Berat Laundry</th>
                             <th>Harga Laundry</th>
+                            <th>Harga Ongkir</th>
+                            <th>Total Harga</th>
                             <th>Metode Pembayaran</th>
                             <th>Lokasi</th>
                             <th>Status Pembayaran</th>
@@ -77,23 +83,53 @@
                         @foreach ($orderan as $o)
                             <tr>
                                 <td>{{ $o->orderan->kode_order }}</td>
+                                <td>{{ $o->orderan->jenisLaundry->nama }}</td>
                                 <td>
                                     {!! $o->orderan->berat ? $o->orderan->berat . ' kg' : '<span class="badge bg-warning">Menunggu Berat</span>' !!}
                                 </td>
                                 <td>
-                                    {!! $o->orderan->harga ? 'Rp' . $o->orderan->harga : '<span class="badge bg-warning">Menunggu Harga</span>' !!}
+                                    {!! $o->orderan->harga
+                                        ? 'Rp ' . number_format($o->orderan->harga, 0, ',', '.')
+                                        : '<span class="badge bg-warning">Menunggu Harga</span>' !!}
+                                </td>
+                                <td>
+                                    {!! $o->ongkir
+                                        ? 'Rp ' . number_format($o->ongkir, 0, ',', '.')
+                                        : '<span class="badge bg-warning">Belum Ada Ongkir</span>' !!}
+                                </td>
+                                <td>
+                                    @if ($o->orderan->harga && $o->ongkir)
+                                        Rp {{ number_format($o->orderan->harga + $o->ongkir, 0, ',', '.') }}
+                                    @else
+                                        <span class="badge bg-warning">Menunggu Harga/Ongkir</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @if ($o->orderan->metode_pembayaran)
-                                        {{ $o->orderan->metode_pembayaran }}
+                                        @if (
+                                            $o->orderan->metode_pembayaran == 'Transfer' &&
+                                                $o->orderan->statusPembayaran->last()->status == 'Menunggu Pembayaran')
+                                            <span class="badge bg-success">Transfer</span>
+                                            <button type="button" class="badge bg-warning border-0"
+                                                style="cursor:pointer;" onclick="bayar({{ $o->orderan->id }})">
+                                                Klik Untuk Bayar
+                                            </button>
+                                        @endif
+
+                                        @if (
+                                            $o->orderan->metode_pembayaran == 'Transfer' &&
+                                                $o->orderan->statusPembayaran->last()->status == 'Pembayaran Berhasil')
+                                            <span class="badge bg-success">Transfer</span>
+                                        @endif
                                     @else
                                         @if ($o->orderan->harga)
-                                            <form action="" method="POST">
+                                            <form id="metodeForm{{ $o->orderan->id }}">
                                                 @csrf
                                                 <select name="metode_pembayaran"
-                                                    class="form-select form-select-sm d-inline w-auto" required>
+                                                    class="form-select form-select-sm d-inline w-auto metode-select"
+                                                    data-order-id="{{ $o->orderan->id }}" required>
                                                     <option value="" disabled selected>Pilih Metode</option>
-                                                    <option value="paket">Paket</option>
+                                                    <option value="Paket">Paket</option>
                                                     <option value="Transfer">Transfer</option>
                                                 </select>
                                             </form>
@@ -104,11 +140,21 @@
                                 </td>
                                 <td>
                                     @if ($o->jarak)
-                                        <ul>
-                                            <li><a href="https://www.google.com/maps/search/?api=1&query={{ $o->latitude }},{{ $o->longitude }}"
-                                                    target="_blank">Link Gmaps</a></li>
-                                            <li><a href="/setLocation/{{ $o->orderan->id }}">Update Lokasi</a></li>
-                                        </ul>
+                                        @if (
+                                            $o->orderan->statusCucian->last()->status == 'Orderan Masuk' ||
+                                                $o->orderan->statusCucian->last()->status == 'Lokasi Jemput Diperbarui')
+                                            <ul>
+                                                <li><a href="https://www.google.com/maps/search/?api=1&query={{ $o->latitude }},{{ $o->longitude }}"
+                                                        target="_blank">Link Gmaps</a></li>
+                                                <li><a href="/setLocation/{{ $o->orderan->id }}">Update Lokasi</a></li>
+                                            </ul>
+                                        @else
+                                            <a href="https://www.google.com/maps/search/?api=1&query={{ $o->latitude }},{{ $o->longitude }}"
+                                                target="_blank">
+                                                <span class="badge bg-success" style="cursor:pointer;">Lihat
+                                                    di Gmaps</span>
+                                            </a>
+                                        @endif
                                     @else
                                         <a href="/setLocation/{{ $o->orderan->id }}" class="btn btn-sm btn-primary">Set
                                             Lokasi</a>
@@ -118,7 +164,7 @@
                                     <ul>
                                         @foreach ($o->orderan->statusPembayaran as $sp)
                                             <li>
-                                                <b>{{ $sp->status }}</b><br>
+                                                <span class="badge bg-info"><b>{{ $sp->status }}</b></span><br>
                                                 {{ $sp->tgl }}
                                             </li>
                                         @endforeach
@@ -128,7 +174,7 @@
                                     <ul>
                                         @foreach ($o->orderan->statusCucian as $sc)
                                             <li>
-                                                <b>{{ $sc->status }}</b><br>
+                                                <span class="badge bg-info"><b>{{ $sc->status }}</b></span><br>
                                                 {{ $sc->tgl }}
                                             </li>
                                         @endforeach
@@ -142,11 +188,26 @@
                                             <i class="fas fa-bars"></i>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="aksiDropdown{{ $o->id }}">
-                                            <li>
-                                                <a class="dropdown-item" href="">
-                                                    <i class="fas fa-eye"></i> Set Lokasi
-                                                </a>
-                                            </li>
+                                            @if (
+                                                $o->orderan->statusCucian->last()->status == 'Orderan Masuk' ||
+                                                    $o->orderan->statusCucian->last()->status == 'Lokasi Jemput Diperbarui')
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="/batalkanOrder/{{ $o->orderan->id }}"
+                                                        onclick="return confirm('Apakah Anda yakin ingin membatalkan order ini?');">
+                                                        <i class="fas fa-times-circle"></i> Batalkan Order
+                                                    </a>
+                                                </li>
+                                            @endif
+                                            @if ($o->orderan->statusCucian->last()->status == 'Cucian Diantar')
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="/cucianSelesai/{{ $o->orderan->id }}"
+                                                        onclick="return confirm('Apakah Anda yakin ingin menyelesaikan order ini?');">
+                                                        <i class="fas fa-check-circle"></i> Cucian Selesai
+                                                    </a>
+                                                </li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>
@@ -157,13 +218,119 @@
             </div>
         </div>
     </div>
+    {{-- </div> --}}
 
     @include('customers.components.footer')
 
+    <!-- Loader Spinner -->
+    <div id="loader"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="{{ asset('assets_customers/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets_customers/js/bootstrap.bundle.min.js') }}"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous">
+    </script>
     <script src="{{ asset('assets_customers/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('assets_customers/js/custom.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.metode-select').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    let orderId = this.getAttribute('data-order-id');
+                    let metode = this.value;
+                    let form = document.getElementById('metodeForm' + orderId);
+                    let token = form.querySelector('input[name="_token"]').value;
+
+                    fetch('/setMetodePembayaran/' + orderId, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                metode_pembayaran: metode
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.fire({
+                                icon: data.success ? 'success' : 'error',
+                                title: data.success ? 'Berhasil' : 'Gagal',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                if (data.success) location.reload();
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        });
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function bayar(id) {
+            // Tampilkan loader
+            $("#loader").css("display", "flex");
+
+            $.ajax({
+                url: "/transaksi/payment",
+                type: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                },
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id
+                },
+                success: function(response) {
+                    $("#loader").hide();
+
+                    snap.pay(response['snap_token'], {
+                        onSuccess: function(result) {
+                            window.location.href = 'transaksi/payment/success/' + response[
+                                'snap_token'];
+                        },
+                        onPending: function(result) {
+                            console.log("Pending:", result);
+                        },
+                        onError: function(result) {
+                            console.log("Error:", result);
+                            Swal.fire("Gagal!", "Transaksi gagal atau dibatalkan.", "error");
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    $("#loader").hide(); // Sembunyikan loader saat gagal
+                    Swal.fire(
+                        "Gagal!",
+                        "Terjadi kesalahan saat memproses data.",
+                        "error"
+                    );
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

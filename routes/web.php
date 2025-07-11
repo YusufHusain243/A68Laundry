@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 // landing page 
 Route::get('/', [CustomerController::class, 'index']);
 
+// Route::middleware(['guest'])->group(function () {
 //auth customer
 Route::get('/loginCustomer', [AuthController::class, 'loginCustomer']);
 Route::post('/loginCustomer', [AuthController::class, 'loginCustomerAuth']);
@@ -112,4 +113,9 @@ Route::middleware(['customer'])->group(function () {
     Route::get('/setLocation/{id}', [CustomerController::class, 'setLocation']);
     Route::get('/geocode', [CustomerController::class, 'search']);
     Route::post('/updateLocation', [CustomerController::class, 'updateLocation']);
+    Route::get('/batalkanOrder/{id}', [CustomerController::class, 'batalkanOrder']);
+    Route::post('/setMetodePembayaran/{id}', [CustomerController::class, 'setMetodePembayaran']);
+    Route::post('/transaksi/payment', [CustomerController::class, 'store']);
+    Route::get('/transaksi/payment/success/{snap}', [CustomerController::class, 'paymentSuccess']);
+    Route::get('/cucianSelesai/{id}', [CustomerController::class, 'cucianSelesai']);
 });
