@@ -121,6 +121,21 @@
                                                 $o->orderan->statusPembayaran->last()->status == 'Pembayaran Berhasil')
                                             <span class="badge bg-success">Transfer</span>
                                         @endif
+
+                                        @if ($o->orderan->metode_pembayaran == 'Paket' && $o->orderan->statusPembayaran->last()->status == 'Menunggu Pembayaran')
+                                            <span class="badge bg-success">Paket</span>
+                                            <form id="paketForm{{ $o->orderan->id }}">
+                                                @csrf
+                                                <select name="paket"
+                                                    class="form-select form-select-sm d-inline w-auto metode-select"
+                                                    data-order-id="{{ $o->orderan->id }}" required>
+                                                    <option value="" disabled selected>Pilih Paket</option>
+                                                    @foreach ($paketSaya as $ps)
+                                                        <option value="{{ $ps->id }}">{{ $ps->paketLaundry->jenisLaundry->nama .' - SISA '. $ps->paketLaundry->berat.'KG' }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
+                                        @endif
                                     @else
                                         @if ($o->orderan->harga)
                                             <form id="metodeForm{{ $o->orderan->id }}">
@@ -161,24 +176,39 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <ul>
-                                        @foreach ($o->orderan->statusPembayaran as $sp)
-                                            <li>
-                                                <span class="badge bg-info"><b>{{ $sp->status }}</b></span><br>
-                                                {{ $sp->tgl }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                                    <span class="badge bg-primary status-toggle" style="cursor:pointer;"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#statusPembayaran{{ $o->orderan->id }}" aria-expanded="false"
+                                        aria-controls="statusPembayaran{{ $o->orderan->id }}">
+                                        Klik untuk melihat status
+                                    </span>
+                                    <div class="collapse mt-2" id="statusPembayaran{{ $o->orderan->id }}">
+                                        <ul>
+                                            @foreach ($o->orderan->statusPembayaran as $sp)
+                                                <li>
+                                                    <span class="badge bg-info"><b>{{ $sp->status }}</b></span><br>
+                                                    {{ $sp->tgl }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 </td>
                                 <td>
-                                    <ul>
-                                        @foreach ($o->orderan->statusCucian as $sc)
-                                            <li>
-                                                <span class="badge bg-info"><b>{{ $sc->status }}</b></span><br>
-                                                {{ $sc->tgl }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                                    <span class="badge bg-primary status-toggle" style="cursor:pointer;"
+                                        data-bs-toggle="collapse" data-bs-target="#statusCucian{{ $o->orderan->id }}"
+                                        aria-expanded="false" aria-controls="statusCucian{{ $o->orderan->id }}">
+                                        Klik untuk melihat status
+                                    </span>
+                                    <div class="collapse mt-2" id="statusCucian{{ $o->orderan->id }}">
+                                        <ul>
+                                            @foreach ($o->orderan->statusCucian as $sc)
+                                                <li>
+                                                    <span class="badge bg-info"><b>{{ $sc->status }}</b></span><br>
+                                                    {{ $sc->tgl }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="dropdown">

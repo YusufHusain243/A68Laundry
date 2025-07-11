@@ -7,6 +7,7 @@ use App\Models\Keranjang;
 use App\Models\Orderan;
 use App\Models\OrderanOnline;
 use App\Models\PaketLaundry;
+use App\Models\PaketMember;
 use App\Models\StatusCucian;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -114,7 +115,9 @@ class CustomerController extends Controller
         $jumlahKeranjang = Keranjang::where('user_id', Auth::user()->id)
             ->where('status', '0')
             ->count();
-        return view('customers.transaksi', compact('orderan', 'jumlahKeranjang'));
+        $paketSaya = PaketMember::with('paketLaundry.jenisLaundry')->where('user_id', auth()->user()->id)->get();
+        // dd($paketSaya[0]->paketLaundry->jenisLaundry->nama);
+        return view('customers.transaksi', compact('orderan', 'jumlahKeranjang', 'paketSaya'));
     }
 
     public function setLocation($id)
