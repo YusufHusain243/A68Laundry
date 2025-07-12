@@ -119,4 +119,5 @@ Route::middleware(['customer'])->group(function () {
     Route::get('/transaksi/payment/success/{snap}', [CustomerController::class, 'paymentSuccess']);
     Route::get('/cucianSelesai/{id}', [CustomerController::class, 'cucianSelesai']);
     Route::post('/paymentPaket/{id}', [CustomerController::class, 'paymentPaket']);
+    Route::get('/cek-status-cucian', [CustomerController::class, 'cekStatusCucian']);
 });

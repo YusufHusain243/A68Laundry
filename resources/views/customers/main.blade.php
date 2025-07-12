@@ -46,6 +46,7 @@
     @include('customers.components.laundry')
     @include('customers.components.paket')
     @include('customers.components.whyChooseMe')
+    @include('customers.components.statusCucian')
     @include('customers.components.footer')
 
     <!-- Loader Spinner -->
@@ -88,11 +89,14 @@
                                 url: '/paket/payment/success/' + response['snap_token'],
                                 type: 'GET',
                                 success: function(res) {
-                                    window.location.href = '/paket/payment/success/' + response['snap_token'];
+                                    window.location.href = '/paket/payment/success/' +
+                                        response['snap_token'];
                                 },
                                 error: function(xhr) {
                                     $("#loader").hide();
-                                    Swal.fire("Gagal!", "Terjadi kesalahan saat memproses data.", "error");
+                                    Swal.fire("Gagal!",
+                                        "Terjadi kesalahan saat memproses data.",
+                                        "error");
                                 }
                             });
                         },
@@ -115,6 +119,58 @@
                 }
             });
         }
+
+        $('#statusCucianForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const orderCode = $('#orderCodeInput').val().trim();
+            if (!orderCode) return;
+
+            $('#statusCucianResult').html('');
+            $('#loadingSpinner').show();
+
+            $.ajax({
+                url: '/cek-status-cucian',
+                type: 'GET',
+                data: {
+                    order_code: orderCode
+                },
+                success: function(res) {
+                    $('#loadingSpinner').hide();
+
+                    if (res.success) {
+                        const data = res.data;
+                        const html = `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Order</th>
+                                    <th>Jenis Laundry</th>
+                                    <th>Status Cucian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong class="text-primary">${data.kode_order}</strong></td>
+                                    <td><strong class="text-success">${data.jenis_laundry}</strong></td>
+                                    <td><strong class="text-success">${data.status}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>`;
+                        $('#statusCucianResult').html(html);
+                    } else {
+                        $('#statusCucianResult').html(
+                            `<div class="alert alert-warning">${res.message}</div>`);
+                    }
+                },
+                error: function() {
+                    $('#loadingSpinner').hide();
+                    $('#statusCucianResult').html(
+                        '<div class="alert alert-danger">Terjadi kesalahan. Silakan coba lagi.</div>'
+                        );
+                }
+            });
+        });
     </script>
 </body>
 

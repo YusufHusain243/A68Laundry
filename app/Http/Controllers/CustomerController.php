@@ -296,4 +296,27 @@ class CustomerController extends Controller
             return redirect()->back()->with('error', 'Pembayaran gagal: ' . $e->getMessage());
         }
     }
+
+    public function cekStatusCucian(Request $request)
+    {
+        $orderCode = $request->query('order_code');
+
+        $order = Orderan::where('kode_order', $orderCode)->with(['jenisLaundry', 'statusCucian'])->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode order tidak ditemukan.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'kode_order' => $order->kode_order,
+                'jenis_laundry' => $order->jenisLaundry->nama,
+                'status' => $order->statusCucian->last()->status ?? 'Belum Ada Status',
+            ]
+        ]);
+    }
 }
