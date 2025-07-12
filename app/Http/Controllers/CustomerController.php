@@ -209,6 +209,41 @@ class CustomerController extends Controller
         }
     }
 
+    public function paymentPaket($orderanId, Request $request)
+    {
+        try {
+            $orderan = Orderan::findOrFail($orderanId);
+            $paketMember = PaketMember::findOrFail($request->paket);
+
+            if($orderan->jenisLaundry->nama !== $paketMember->paketLaundry->jenisLaundry->nama) {
+                return response()->json(['error' => false, 'message' => 'Jenis laundry tidak sesuai dengan paket yang dipilih.'], 400);
+            }
+
+            if($orderan->berat > $paketMember->kg_sisa) {
+                return response()->json(['error' => false, 'message' => 'Berat cucian tidak memenuhi syarat paket.'], 400);
+            }
+
+            $orderan->update([
+                'is_paket' => 1,
+            ]);
+
+            self::updateData(
+                $orderanId,
+                'Cucian Diproses',
+                'Pembayaran Berhasil',
+            );
+
+            $paketMember->update([
+                'kg_sisa' => $paketMember->kg_sisa - $orderan->berat,
+                'kg_terpakai' => $paketMember->kg_terpakai + $orderan->berat,
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Metode pembayaran berhasil diubah.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
