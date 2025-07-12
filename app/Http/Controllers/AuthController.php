@@ -20,7 +20,12 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
-            // dd(auth()->attempt($request->only('username', 'password')));
+            $user = User::where('username', $request->username)->first();
+
+            if ($user->role !== 'Member') {
+                return redirect('/loginCustomer')->withErrors(['error' => 'Invalid Role']);
+            }
+
             if (auth()->attempt($request->only('username', 'password'))) {
                 return redirect('/')->with('success', 'Login successful!');
             }
@@ -30,7 +35,7 @@ class AuthController extends Controller
             return redirect('/loginCustomer')->withErrors(['error' => $e->getMessage()]);
         }
     }
-    
+
     public function loginStaff()
     {
         return view('staffs.login');
@@ -44,6 +49,12 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
+            $user = User::where('username', $request->username)->first();
+
+            if ($user->role !== 'Staff') {
+                return redirect('/loginCustomer')->withErrors(['error' => 'Invalid Role']);
+            }
+
             if (auth()->attempt($request->only('username', 'password'))) {
                 return redirect('/orderanOffline')->with('success', 'Login successful!');
             }
@@ -53,7 +64,7 @@ class AuthController extends Controller
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
     }
-   
+
     public function loginOwner()
     {
         return view('owners.login');
@@ -66,6 +77,12 @@ class AuthController extends Controller
                 'username' => 'required|string',
                 'password' => 'required|string',
             ]);
+
+            $user = User::where('username', $request->username)->first();
+
+            if ($user->role !== 'Owner') {
+                return redirect('/loginCustomer')->withErrors(['error' => 'Invalid Role']);
+            }
 
             if (auth()->attempt($request->only('username', 'password'))) {
                 return redirect('/dashboardOwner')->with('success', 'Login successful!');
@@ -112,7 +129,8 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(){
+    public function logout()
+    {
         auth()->logout();
         return redirect('/')->with('success', 'Logout successful!');
     }
