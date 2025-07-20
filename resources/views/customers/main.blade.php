@@ -64,6 +64,10 @@
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
+    <script
+        src='https://cdn.jotfor.ms/agent/embedjs/0197060efd357570ad7ee417a7fa255652d8/embed.js?skipWelcome=1&maximizable=1'>
+    </script>
+
     <script>
         function bayar(id) {
             // Tampilkan loader
